@@ -38,7 +38,8 @@ class AccountController extends Controller
             'description' => $r->description,
             'opening_balance' => 0,
             'status' => 'active',
-            'addedby_id' => $r->account_owner,
+            'owner' => $r->account_owner,
+            'created_by' => Auth::id(),
         ]);
 
         Session()->flash('success', 'Account successfully created');
@@ -56,7 +57,7 @@ class AccountController extends Controller
 
         $account->name = $r->name;
         $account->description = $r->description;
-        $account->addedby_id = $r->account_owner;
+        $account->owner = $r->account_owner;
         $account->status = $r->status ? 'active' : 'inactive';
         $account->created_at = $r->created_at;
         $account->editedby_id = Auth::id();

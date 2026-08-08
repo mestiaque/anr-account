@@ -9,7 +9,7 @@ class Account extends Model
     protected $table = 'ac_accounts';
 
     protected $fillable = [
-        'name', 'description', 'opening_balance', 'status', 'addedby_id', 'editedby_id', 'legacy_id',
+        'name', 'description', 'opening_balance', 'status', 'owner', 'created_by', 'editedby_id', 'legacy_id',
     ];
 
     protected $casts = [
@@ -26,9 +26,14 @@ class Account extends Model
         });
     }
 
-    public function user()
+    public function owner()
     {
-        return $this->belongsTo(\App\Models\User::class, 'addedby_id');
+        return $this->belongsTo(\App\Models\User::class, 'owner');
+    }
+
+    public function createdBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
     }
 
     public function transactions()

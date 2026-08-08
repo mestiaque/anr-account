@@ -30,8 +30,8 @@ class IouController extends Controller
             ->get();
 
         $paymentMethods = PaymentMethod::where('status', 'active')->orderBy('name')->get();
-        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
-        $filterAccounts = $accountMethods;
+        $accountMethods = Account::where('status', 'active')->where('owner', Auth::id())->orderBy('name')->get();
+        $filterAccounts = Account::where('status', 'active')->orderBy('name')->get();
         $branches = Branch::where('status', 'active')->orderBy('name')->get();
         $users = User::where('status', 1)->orderBy('name')->get();
 

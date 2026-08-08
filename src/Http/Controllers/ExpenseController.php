@@ -45,8 +45,8 @@ class ExpenseController extends Controller
 
         $expenseTypes = ExpenseCategory::where('status', 'active')->orderBy('name')->get();
         $paymentMethods = PaymentMethod::where('status', 'active')->orderBy('name')->get();
-        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
-        $filterAccounts = $accountMethods;
+        $accountMethods = Account::where('status', 'active')->where('owner', Auth::id())->orderBy('name')->get();
+        $filterAccounts = Account::where('status', 'active')->orderBy('name')->get();
         $branches = Branch::where('status', 'active')->orderBy('name')->get();
         $creditors = User::filterByType('supplier')->where('status', 1)->orderBy('name')->get();
         $lastAudit = Expense::whereNotNull('audit_at')->latest()->first();

@@ -19,7 +19,7 @@ class CreditorBillPaymentController extends Controller
             ->latest()
             ->paginate(25);
 
-        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
+        $accountMethods = Account::where('status', 'active')->where('owner', Auth::id())->orderBy('name')->get();
         $paymentMethods = PaymentMethod::where('status', 'active')->orderBy('name')->get();
         $creditors = User::filterByType('supplier')->where('status', 1)->orderBy('name')->get();
 

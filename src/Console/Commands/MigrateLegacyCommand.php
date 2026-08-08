@@ -56,7 +56,6 @@ class MigrateLegacyCommand extends Command
                         'legacy_id' => $row->id,
                         'name' => $row->name ?: ('#' . $row->id),
                         'status' => $row->status === 'active' ? 'active' : 'inactive',
-                        'addedby_id' => $row->addedby_id,
                         'editedby_id' => $row->editedby_id,
                         'created_at' => $row->created_at,
                         'updated_at' => $row->updated_at,
@@ -71,6 +70,12 @@ class MigrateLegacyCommand extends Command
                     if ($table === 'ac_accounts') {
                         $data['opening_balance'] = 0;
                         $data['current_balance'] = 0; // recomputed later from migrated transactions
+                        // Legacy addedby_id was already used as the account "owner" for
+                        // filtering which accounts a user could pick in expense/IOU forms.
+                        $data['owner'] = $row->addedby_id;
+                        $data['created_by'] = $row->addedby_id;
+                    } else {
+                        $data['addedby_id'] = $row->addedby_id;
                     }
 
                     DB::table($table)->insert($data);
