@@ -25,6 +25,6 @@ class CreditorBillPayment extends Model
 
     public function creditor()
     {
-        return $this->belongsTo(\App\Models\User::class, 'creditor_id');
+        return $this->belongsTo(Creditor::class, 'creditor_id');
     }
 }

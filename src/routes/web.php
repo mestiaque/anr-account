@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use ME\Accounts\Http\Controllers\AccountController;
 use ME\Accounts\Http\Controllers\BalanceTransferController;
 use ME\Accounts\Http\Controllers\CreditorBillPaymentController;
+use ME\Accounts\Http\Controllers\CreditorController;
 use ME\Accounts\Http\Controllers\DepositController;
 use ME\Accounts\Http\Controllers\ExpenseCategoryController;
 use ME\Accounts\Http\Controllers\ExpenseController;
@@ -73,6 +74,13 @@ Route::middleware(['web', 'logUserActivity', 'auth', 'redirectUser'])
         Route::prefix('creditor-bill-payments')->name('creditorBillPayments.')->group(function () {
             Route::get('/', [CreditorBillPaymentController::class, 'index'])->name('index');
             Route::post('/', [CreditorBillPaymentController::class, 'store'])->name('store');
+        });
+
+        Route::prefix('creditors')->name('creditors.')->group(function () {
+            Route::get('/', [CreditorController::class, 'index'])->name('index');
+            Route::post('/', [CreditorController::class, 'store'])->name('store');
+            Route::put('/{creditor}', [CreditorController::class, 'update'])->name('update');
+            Route::delete('/{creditor}', [CreditorController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('payment-methods')->name('paymentMethods.')->group(function () {

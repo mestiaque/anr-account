@@ -6,6 +6,7 @@ use App\Models\Attribute as LegacyAttribute;
 use App\Models\Expense as LegacyExpense;
 use App\Models\ExpenseIou as LegacyExpenseIou;
 use App\Models\Transaction as LegacyTransaction;
+use App\Models\User as LegacyUser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use ME\Accounts\Services\SequenceGenerator;
@@ -23,6 +24,7 @@ class MigrateLegacyCommand extends Command
 
         DB::transaction(function () {
             $this->migrateLookups();
+            $this->migrateCreditors();
             $this->migrateExpenses();
             $this->migrateIous();
             $this->migrateDepositsWithdrawalsTransfersAndBills();
@@ -82,6 +84,37 @@ class MigrateLegacyCommand extends Command
                 }
             });
         }
+    }
+
+    protected function migrateCreditors(): void
+    {
+        LegacyUser::filterByType('supplier')->orderBy('id')->chunk(200, function ($rows) {
+            foreach ($rows as $row) {
+                if (DB::table('ac_creditors')->where('legacy_user_id', $row->id)->exists()) {
+                    continue;
+                }
+
+                DB::table('ac_creditors')->insert([
+                    'legacy_user_id' => $row->id,
+                    'name' => $row->name ?: ('#' . $row->id),
+                    'company_name' => $row->company_name ?? null,
+                    'mobile' => $row->mobile,
+                    'email' => $row->email,
+                    'status' => $row->status ? 'active' : 'inactive',
+                    'created_at' => $row->created_at,
+                    'updated_at' => $row->updated_at,
+                ]);
+            }
+        });
+    }
+
+    protected function creditorId(?int $legacyUserId): ?int
+    {
+        if (!$legacyUserId) {
+            return null;
+        }
+
+        return DB::table('ac_creditors')->where('legacy_user_id', $legacyUserId)->value('id');
     }
 
     protected function accountId(?int $legacyAttributeId): ?int
@@ -423,7 +456,7 @@ class MigrateLegacyCommand extends Command
         $paymentId = DB::table('ac_creditor_bill_payments')->insertGetId([
             'legacy_id' => $row->id,
             'payment_no' => SequenceGenerator::next('creditor_bill_payment'),
-            'creditor_id' => $row->user_id,
+            'creditor_id' => $this->creditorId($row->user_id),
             'purchase_id' => $row->src_id,
             'account_id' => $accountId,
             'payment_method_id' => $this->paymentMethodId($row->payment_method_id),

@@ -34,6 +34,10 @@ return [
             'label' => 'Creditor Bill Payments',
             'permissions' => ['list' => 'List', 'add' => 'Create', 'all' => 'All'],
         ],
+        'ac_creditors' => [
+            'label' => 'Creditors',
+            'permissions' => ['list' => 'List', 'add' => 'Create', 'edit' => 'Edit', 'delete' => 'Delete', 'all' => 'All'],
+        ],
         'ac_payment_methods' => [
             'label' => 'Payment Methods',
             'permissions' => ['list' => 'List', 'add' => 'Create', 'edit' => 'Edit', 'delete' => 'Delete', 'all' => 'All'],

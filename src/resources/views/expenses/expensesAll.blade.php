@@ -422,8 +422,8 @@
         			    <label for="name">Account Method *</label>
                         <select class="form-control" name="account" required="">
                             <option value="">Select Account</option>
-                            @foreach($accountMethods as $method)
-                            <option value="{{$method->id}}">{{$method->name}} - BDT {{priceFormat($method->current_balance)}}</option>
+                            @foreach($accountMethods as $m=>$method)
+                            <option value="{{$method->id}}" {{$m==0?'selected':''}}>{{$method->name}} - BDT {{priceFormat($method->current_balance)}}</option>
                             @endforeach
                         </select>
         				@if ($errors->has('payment'))
@@ -904,7 +904,7 @@
                 <p class="contact-info">Mobile: {{general()->mobile}}, {{general()->email}}</p>
 
                 <div class="transaction-badge">TRANSACTION SLIP</div>
-                <p class="" style="margin:0px !important"><i><b> {{$exp->category->name}}</b></i></p>
+                <p class="" style="margin:0px !important"><i><b> {{$exp->category?->name}}</b></i></p>
             </div>
 
             <div class="date-field">

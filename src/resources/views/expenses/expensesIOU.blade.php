@@ -316,7 +316,7 @@
                         <select class="form-control" name="account" required="">
                             <option value="">Select Account</option>
                             @foreach($accountMethods as $m=>$method)
-                            <option value="{{$method->id}}" {{$m==0?'selected':''}}>{{$method->name}} - BDT {{priceFormat($method->amount)}}</option>
+                            <option value="{{$method->id}}" {{$m==0?'selected':''}}>{{$method->name}} - BDT {{priceFormat($method->current_balance)}}</option>
                             @endforeach
                         </select>
         				@if ($errors->has('payment'))

@@ -74,6 +74,13 @@ return [
                     'permission' => 'ac_creditor_bill_payments',
                 ],
                 [
+                    'title'      => 'Creditors',
+                    'icon'       => 'fa-solid fa-arrow-right',
+                    'route'      => '/admin/v2/creditors',
+                    'icon_color' => 'text-warning',
+                    'permission' => 'ac_creditors',
+                ],
+                [
                     'title'      => 'Payment Methods',
                     'icon'       => 'fa-solid fa-arrow-right',
                     'route'      => '/admin/v2/payment-methods',
