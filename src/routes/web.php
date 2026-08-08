@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use ME\Accounts\Http\Controllers\AccountController;
+use ME\Accounts\Http\Controllers\AccountsDashboardController;
 use ME\Accounts\Http\Controllers\BalanceTransferController;
 use ME\Accounts\Http\Controllers\CreditorBillController;
 use ME\Accounts\Http\Controllers\CreditorBillPaymentController;
@@ -20,6 +21,8 @@ Route::middleware(['web', 'logUserActivity', 'auth', 'redirectUser'])
     ->prefix('admin/v2')
     ->name('admin.')
     ->group(function () {
+
+        Route::get('/', [AccountsDashboardController::class, 'index'])->name('accountsDashboard');
 
         Route::prefix('accounts')->name('accounts.')->group(function () {
             Route::get('/', [AccountController::class, 'index'])->name('index');

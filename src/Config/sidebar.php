@@ -11,6 +11,13 @@ return [
             'order'      => 11,
             'children'   => [
                 [
+                    'title'      => 'Accounts Dashboard',
+                    'icon'       => 'fa-solid fa-gauge-high',
+                    'route'      => '/admin/v2',
+                    'icon_color' => 'text-primary',
+                    'permission' => '',
+                ],
+                [
                     'title'      => 'Accounts',
                     'icon'       => 'fa-solid fa-arrow-right',
                     'route'      => '/admin/v2/accounts',

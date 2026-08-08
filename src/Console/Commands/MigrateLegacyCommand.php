@@ -18,11 +18,16 @@ class MigrateLegacyCommand extends Command
 
     public function handle(): int
     {
-        if ($this->option('fresh')) {
-            $this->wipe();
-        }
-
+        // wipe() and the repopulation must be one atomic unit — if wipe() ran
+        // outside this transaction and repopulation later failed, the wipe
+        // would stay committed while the rebuild rolled back, leaving every
+        // ac_* table permanently empty. (This actually happened once — see
+        // the "Data recovery" note in this file's git history.)
         DB::transaction(function () {
+            if ($this->option('fresh')) {
+                $this->wipe();
+            }
+
             $this->migrateLookups();
             $this->migrateCreditors();
             $this->migrateExpenses();
@@ -38,7 +43,7 @@ class MigrateLegacyCommand extends Command
 
     protected function wipe(): void
     {
-        foreach (['ac_transactions', 'ac_expenses', 'ac_ious', 'ac_deposits', 'ac_withdrawals', 'ac_balance_transfers', 'ac_creditor_bill_payments', 'ac_accounts', 'ac_payment_methods', 'ac_expense_categories', 'ac_branches'] as $table) {
+        foreach (['ac_transactions', 'ac_expenses', 'ac_ious', 'ac_deposits', 'ac_withdrawals', 'ac_balance_transfers', 'ac_creditor_bill_payments', 'ac_creditor_bills', 'ac_creditors', 'ac_accounts', 'ac_payment_methods', 'ac_expense_categories', 'ac_branches'] as $table) {
             DB::table($table)->delete();
         }
     }
