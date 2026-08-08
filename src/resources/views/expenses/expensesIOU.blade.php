@@ -224,7 +224,10 @@
                             <td>{{$Iou->account?$Iou->account->name:''}}</td>
                             <td>{{$Iou->branch?$Iou->branch->name:''}}</td>
                             <td class="text-center">
-                                @if(auth()->user()->hasPermission('iou.edit') || auth()->user()->hasPermission('iou.delete'))
+                                <a href="javascript:void(0)" data-toggle="modal" data-target="#ViewExpense_{{$Iou->id}}" class="btn-custom yellow">
+                                    <i class="bx bx-show"></i>
+                                </a>
+                                @if(auth()->user()->hasPermission('ac_ious.edit') || auth()->user()->hasPermission('ac_ious.delete'))
 
                                  @can('ac_ious.edit')
                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#EditExpense_{{$Iou->id}}" class="btn-custom success">
@@ -232,11 +235,12 @@
                                 </a>
                                 @endcan
                                 @can('ac_ious.delete')
-                                <a href="javascript:void(0)" data-toggle="modal" data-target="#ViewExpense_{{$Iou->id}}" class="btn-custom yellow">
-                                    <i class="bx bx-show"></i>
-                                </a>
+                                <a href="{{route('admin.ious.destroy',$Iou->id)}}" class="btn-custom danger mediaDelete mr-1">
+                                    <i class="bx bx-trash"></i>
                                 @endcan
-                                @else -- @endif
+
+                                @else --
+                                 @endif
                             </td>
                         </tr>
                         @endforeach
