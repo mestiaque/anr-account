@@ -89,7 +89,7 @@
                             </td> --}}
                             <td>
                                 <b>Title:</b><span> {{$method->name}}</span><br>
-                                <b>Owner:</b><span> {{$method->owner?$method->owner->name:'No Owner'}}</span><br>
+                                <b>Owner:</b><span> {{$method->ownerUser?$method->ownerUser->name:'No Owner'}}</span><br>
                                 <b>Opening Date:</b> {{$method->created_at->format('d-m-Y')}}
                                 @if($method->status=='active')
                                 <span style="color: #43d39e;font-size: 20px;line-height: 20px;">
@@ -242,7 +242,7 @@
                     <select class="form-control" name="account_owner" required="">
                         <option value="">Select Owner</option>
                         @foreach($adminUsers as $user)
-                            <option value="{{$user->id}}" {{ $dpm?->owner?->id == $user->id ? 'selected':'' }}>{{$user->name}}</option>
+                            <option value="{{$user->id}}" {{ $dpm?->ownerUser?->id == $user->id ? 'selected':'' }}>{{$user->name}}</option>
                         @endforeach
                     </select>
     				@if ($errors->has('name'))

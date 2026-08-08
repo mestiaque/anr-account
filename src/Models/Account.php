@@ -26,7 +26,9 @@ class Account extends Model
         });
     }
 
-    public function owner()
+    // Named ownerUser() not owner() — a relation method can't share a name with
+    // the `owner` column itself; Eloquent would return the raw int, not the model.
+    public function ownerUser()
     {
         return $this->belongsTo(\App\Models\User::class, 'owner');
     }
