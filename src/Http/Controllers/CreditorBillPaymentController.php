@@ -7,7 +7,6 @@ use ME\Accounts\Models\Creditor;
 use ME\Accounts\Models\CreditorBill;
 use ME\Accounts\Models\CreditorBillPayment;
 use ME\Accounts\Models\Expense;
-use ME\Accounts\Models\ExpenseCategory;
 use ME\Accounts\Models\PaymentMethod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -101,26 +100,21 @@ class CreditorBillPaymentController extends Controller
         ]);
 
         $account = Account::findOrFail($r->account);
+        // dd($account);
 
         if ($r->amount > $account->current_balance) {
             Session()->flash('error', 'Account Balance Are Not Available');
             return redirect()->back();
         }
-
         $creditor = Creditor::findOrFail($r->creditor_id);
+
         $transactionDate = $r->created_at ?: Carbon::now();
 
-        // The Expense is the single source of truth for the account deduction (so it
-        // also shows up in Expense List / Expense Reports); CreditorBillPayment below
-        // links to it purely for the creditor's own ledger/profile — it does not create
-        // a second transaction (see CreditorBillPaymentObserver).
-        $category = ExpenseCategory::firstOrCreate(
-            ['name' => 'Creditor Bill Payment'],
-            ['status' => 'active', 'addedby_id' => Auth::id()]
-        );
-
+        // category_id=0 is not a real expense category — it marks this Expense as a
+        // display-only shadow row created alongside a creditor bill payment (matches
+        // the legacy-import convention, see MigrateLegacyCommand::migrateExpenses).
         $expense = Expense::create([
-            'category_id' => $category->id,
+            'category_id' => 0,
             'payment_method_id' => $r->payment,
             'account_id' => $account->id,
             'amount' => $r->amount,

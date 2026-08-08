@@ -2,16 +2,17 @@
 
 namespace ME\Accounts\Http\Controllers;
 
-use ME\Accounts\Models\Account;
-use ME\Accounts\Models\Branch;
-use ME\Accounts\Models\CreditorBillPayment;
-use ME\Accounts\Models\Expense;
-use ME\Accounts\Models\ExpenseCategory;
-use ME\Accounts\Models\PaymentMethod;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use ME\Accounts\Models\Account;
+use ME\Accounts\Models\Branch;
+use ME\Accounts\Models\Creditor;
+use ME\Accounts\Models\CreditorBillPayment;
+use ME\Accounts\Models\Expense;
+use ME\Accounts\Models\ExpenseCategory;
+use ME\Accounts\Models\PaymentMethod;
 
 class ExpenseController extends Controller
 {
@@ -49,7 +50,7 @@ class ExpenseController extends Controller
         $accountMethods = Account::where('status', 'active')->where('owner', Auth::id())->orderBy('name')->get();
         $filterAccounts = Account::where('status', 'active')->orderBy('name')->get();
         $branches = Branch::where('status', 'active')->orderBy('name')->get();
-        $creditors = User::filterByType('supplier')->where('status', 1)->orderBy('name')->get();
+        $creditors = Creditor::all();
         $lastAudit = Expense::whereNotNull('audit_at')->latest()->first();
 
         return view('erp-accounts::expenses.expensesAll', compact('expenses', 'report', 'expenseTypes', 'paymentMethods', 'accountMethods', 'branches', 'to', 'from', 'lastAudit', 'filterAccounts', 'creditors'));
