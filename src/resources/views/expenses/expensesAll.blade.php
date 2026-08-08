@@ -606,7 +606,7 @@
                         <select class="form-control" name="payment" required="">
                             <option value="">Select Method</option>
                             @foreach($paymentMethods as $method)
-                            <option value="{{$method->id}}" {{$dpm->method_id==$method->id?'selected':''}}>{{$method->name}}</option>
+                            <option value="{{$method->id}}" {{$dpm->payment_method_id==$method->id?'selected':''}}>{{$method->name}}</option>
                             @endforeach
                         </select>
         				@if ($errors->has('payment'))

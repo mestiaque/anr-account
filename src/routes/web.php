@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use ME\Accounts\Http\Controllers\AccountController;
 use ME\Accounts\Http\Controllers\BalanceTransferController;
+use ME\Accounts\Http\Controllers\CreditorBillController;
 use ME\Accounts\Http\Controllers\CreditorBillPaymentController;
 use ME\Accounts\Http\Controllers\CreditorController;
 use ME\Accounts\Http\Controllers\DepositController;
@@ -79,8 +80,16 @@ Route::middleware(['web', 'logUserActivity', 'auth', 'redirectUser'])
         Route::prefix('creditors')->name('creditors.')->group(function () {
             Route::get('/', [CreditorController::class, 'index'])->name('index');
             Route::post('/', [CreditorController::class, 'store'])->name('store');
+            Route::get('/{creditor}', [CreditorController::class, 'show'])->name('show');
             Route::put('/{creditor}', [CreditorController::class, 'update'])->name('update');
             Route::delete('/{creditor}', [CreditorController::class, 'destroy'])->name('destroy');
+            Route::post('/{creditor}/restore', [CreditorController::class, 'restore'])->name('restore');
+        });
+
+        Route::prefix('creditor-bills')->name('creditor-bills.')->group(function () {
+            Route::post('/{creditor}', [CreditorBillController::class, 'store'])->name('store');
+            Route::put('/{creditorBill}', [CreditorBillController::class, 'update'])->name('update');
+            Route::delete('/{creditorBill}', [CreditorBillController::class, 'destroy'])->name('destroy');
         });
 
         Route::prefix('payment-methods')->name('paymentMethods.')->group(function () {
