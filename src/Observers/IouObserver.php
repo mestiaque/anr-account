@@ -49,6 +49,11 @@ class IouObserver
         if ($iou->wasChanged('amount') && $transaction->status === 'success') {
             LedgerService::adjustAmount($transaction, (float) $iou->amount);
         }
+
+        if ($iou->wasChanged('transaction_date')) {
+            $transaction->transaction_date = $iou->transaction_date;
+            $transaction->save();
+        }
     }
 
     public function deleted(Iou $iou): void

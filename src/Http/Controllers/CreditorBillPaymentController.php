@@ -96,11 +96,10 @@ class CreditorBillPaymentController extends Controller
             'purchase_id' => 'nullable|numeric',
             'payment' => 'nullable|numeric',
             'amount' => 'required|numeric',
-            'created_at' => 'nullable|date',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $account = Account::findOrFail($r->account);
-        // dd($account);
 
         if ($r->amount > $account->current_balance) {
             Session()->flash('error', 'Account Balance Are Not Available');
@@ -108,7 +107,7 @@ class CreditorBillPaymentController extends Controller
         }
         $creditor = Creditor::findOrFail($r->creditor_id);
 
-        $transactionDate = $r->created_at ?: Carbon::now();
+        $transactionDate = $r->transaction_date ?: Carbon::now();
 
         // category_id=0 is not a real expense category — it marks this Expense as a
         // display-only shadow row created alongside a creditor bill payment (matches

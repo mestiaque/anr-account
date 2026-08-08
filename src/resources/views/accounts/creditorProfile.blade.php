@@ -191,7 +191,7 @@
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label fw-bold">Created Date</label>
-                                        <input type="date" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" class="form-control" required>
+                                        <input type="date" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" class="form-control" required>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label fw-bold">Bill Title/Invoice No</label>
@@ -218,7 +218,7 @@
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label class="form-label fw-bold">Created Date</label>
-                                        <input type="date" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" class="form-control" required>
+                                        <input type="date" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" class="form-control" required>
                                     </div>
 
                                     <div class="mb-2 col-md-4">
@@ -282,7 +282,7 @@
               <div class="modal-body">
                 <div class="form-group">
                     <label>Date*</label>
-                    <input type="date" class="form-control" name="created_at" value="{{$item->date?->format('Y-m-d')}}" required>
+                    <input type="date" class="form-control" name="transaction_date" value="{{$item->date?->format('Y-m-d')}}" required>
                 </div>
                 <div class="form-group">
                     <label>Title*</label>

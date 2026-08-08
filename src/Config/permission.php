@@ -20,7 +20,7 @@ return [
         ],
         'ac_deposits' => [
             'label' => 'Deposits',
-            'permissions' => ['list' => 'List', 'add' => 'Create', 'edit' => 'Edit', 'view' => 'View', 'delete' => 'Delete', 'all' => 'All'],
+            'permissions' => ['list' => 'List', 'add' => 'Create', 'edit' => 'Edit', 'view' => 'View', 'delete' => 'Delete', 'all' => 'All', 'approve' => 'Approve'],
         ],
         'ac_withdrawals' => [
             'label' => 'Withdrawals',

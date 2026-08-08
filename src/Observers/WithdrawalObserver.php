@@ -34,14 +34,23 @@ class WithdrawalObserver
 
     public function updated(Withdrawal $withdrawal): void
     {
-        if (!$withdrawal->wasChanged('amount')) {
+        if (!$withdrawal->wasChanged('amount') && !$withdrawal->wasChanged('transaction_date')) {
             return;
         }
 
         $transaction = Transaction::where('source_type', 'withdrawal')->where('source_id', $withdrawal->id)->first();
 
-        if ($transaction) {
+        if (!$transaction) {
+            return;
+        }
+
+        if ($withdrawal->wasChanged('amount')) {
             LedgerService::adjustAmount($transaction, (float) $withdrawal->amount);
+        }
+
+        if ($withdrawal->wasChanged('transaction_date')) {
+            $transaction->transaction_date = $withdrawal->transaction_date;
+            $transaction->save();
         }
     }
 

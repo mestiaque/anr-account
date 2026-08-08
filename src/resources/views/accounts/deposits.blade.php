@@ -129,7 +129,7 @@
                                 @endif
                             </td>
                             <td>
-                                <b>Date:</b> {{$transection->created_at->format('d-m-Y')}}<br>
+                                <b>Date:</b> {{$transection->transaction_date?->format('d-m-Y')}}<br>
                                 <b>TNX Id:</b> {{$transection->deposit_no}} @if($transection->imageFile) <a href="{{asset($transection->imageFile->file_url)}}" target="_blank"><i class="bx bx-file"></i></a> @endif <br>
                                 <b>Accounts:</b> {{$transection->account?$transection->account->name:''}}
                                         @if($transection->account)
@@ -169,11 +169,9 @@
                                     @can('ac_deposits.approve')
                                         @if($transection->status == 'pending')
                                             {{-- Approve Button --}}
-                                            <a href="{{ route('admin.deposits.approve', $transection->id) }}"
-                                            class="btn-custom yellow"
-                                            onclick="return confirm('Mark as Approved?');">
-                                                <i class="bx bx-check-circle"></i> Approve {{-- relative icon --}}
-                                            </a>
+                                            <button type="button" class="btn-custom yellow" onclick="approveDeposit('{{ route('admin.deposits.approve', $transection->id) }}')">
+                                                <i class="bx bx-check-circle"></i> Approve
+                                            </button>
                                         @endif
                                     @endcan
                                 @else -- @endif
@@ -198,9 +196,25 @@
             </div>
         </form>
 
+        <form id="approveForm" method="post" style="display:none;">
+            @csrf
+        </form>
 
     </div>
 </div>
+
+@push('js')
+<script>
+    function approveDeposit(url) {
+        if (!confirm('Mark as Approved?')) {
+            return;
+        }
+        var form = document.getElementById('approveForm');
+        form.action = url;
+        form.submit();
+    }
+</script>
+@endpush
 </div>
 
 <!-- Add Modal -->
@@ -219,9 +233,9 @@
     	       <div class="row">
     	           <div class="col-md-12 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}"  required="">
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                     <div class="col-md-12 form-group">
@@ -301,9 +315,9 @@
     	       <div class="row">
     	           <div class="col-md-12 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{$dpm->created_at->format('Y-m-d')}}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{$dpm->transaction_date?->format('Y-m-d')}}"  required="">
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                     <div class="col-md-12 form-group">

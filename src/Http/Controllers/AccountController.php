@@ -37,6 +37,7 @@ class AccountController extends Controller
             'name' => $r->name,
             'description' => $r->description,
             'opening_balance' => 0,
+            'opening_date' => Carbon::now(),
             'status' => 'active',
             'owner' => $r->account_owner,
             'created_by' => Auth::id(),
@@ -52,14 +53,14 @@ class AccountController extends Controller
             'name' => 'required|max:100',
             'description' => 'nullable|max:1000',
             'account_owner' => 'required|numeric',
-            'created_at' => 'required|date',
+            'opening_date' => 'required|date',
         ]);
 
         $account->name = $r->name;
         $account->description = $r->description;
         $account->owner = $r->account_owner;
         $account->status = $r->status ? 'active' : 'inactive';
-        $account->created_at = $r->created_at;
+        $account->opening_date = $r->opening_date;
         $account->editedby_id = Auth::id();
         $account->save();
 

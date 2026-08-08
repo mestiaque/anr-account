@@ -195,7 +195,7 @@
                     <tbody>
                         @foreach($expenses as $expense)
                         <tr>
-                            <td>{{$expense->created_at->format('d.m.Y')}}</td>
+                            <td>{{$expense->transaction_date?->format('d.m.Y')}}</td>
                             <td>{{$expense->company_name}}</td>
                             <td>{{$expense->receiver_name}}</td>
                             <td>{{$expense->employeeUser?$expense->employeeUser->name:'not found'}}</td>

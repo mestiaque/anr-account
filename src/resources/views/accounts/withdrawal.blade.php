@@ -149,7 +149,7 @@
                                 @if($transection->bank_name)
                                 <b>Bank Name:</b> {{$transection->bank_name}} <br>
                                 @endif
-                                <b>Date:</b> {{$transection->created_at->format('d-m-Y')}}<br>
+                                <b>Date:</b> {{$transection->transaction_date?->format('d-m-Y')}}<br>
                             </td>
                             <td>
                                 @php $afterBalance = $transection->transaction->balance_after ?? 0; @endphp
@@ -188,9 +188,9 @@
     	       <div class="row">
     	           <div class="col-md-6 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}"  required="">
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                  	<div class="col-md-6 form-group">
@@ -278,9 +278,9 @@
     	       <div class="row">
     	           <div class="col-md-6 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{$dpm->created_at->format('Y-m-d')}}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{$dpm->transaction_date?->format('Y-m-d')}}"  required="">
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                  	<div class="col-md-6 form-group">

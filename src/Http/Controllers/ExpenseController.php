@@ -67,7 +67,7 @@ class ExpenseController extends Controller
             'company_name' => 'required|max:100',
             'receiver_name' => 'required|max:100',
             'receiver_mobile' => 'nullable|max:100',
-            'created_at' => 'nullable|date',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $account = Account::findOrFail($r->account);
@@ -88,7 +88,7 @@ class ExpenseController extends Controller
             'receiver_name' => $r->receiver_name,
             'receiver_mobile' => $r->receiver_mobile,
             'status' => 'active',
-            'transaction_date' => $r->created_at ?: Carbon::now(),
+            'transaction_date' => $r->transaction_date ?: Carbon::now(),
             'addedby_id' => Auth::id(),
         ]);
 
@@ -105,6 +105,7 @@ class ExpenseController extends Controller
             'company_name' => 'required|max:100',
             'receiver_name' => 'required|max:100',
             'amount' => 'required|numeric',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $expense->category_id = $r->expense_type;
@@ -116,6 +117,7 @@ class ExpenseController extends Controller
         $expense->receiver_name = $r->receiver_name;
         $expense->receiver_mobile = $r->receiver_mobile;
         $expense->status = $r->status ? 'active' : 'inactive';
+        $expense->transaction_date = $r->transaction_date ?: $expense->transaction_date;
         $expense->editedby_id = Auth::id();
         $expense->save();
 

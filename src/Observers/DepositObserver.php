@@ -37,14 +37,21 @@ class DepositObserver
 
     public function updated(Deposit $deposit): void
     {
-        if (!$deposit->wasChanged('status') || $deposit->status !== 'success') {
-            return;
+        if ($deposit->wasChanged('status') && $deposit->status === 'success') {
+            $transaction = Transaction::where('source_type', 'deposit')->where('source_id', $deposit->id)->first();
+
+            if ($transaction) {
+                LedgerService::markSuccess($transaction);
+            }
         }
 
-        $transaction = Transaction::where('source_type', 'deposit')->where('source_id', $deposit->id)->first();
+        if ($deposit->wasChanged('transaction_date')) {
+            $transaction ??= Transaction::where('source_type', 'deposit')->where('source_id', $deposit->id)->first();
 
-        if ($transaction) {
-            LedgerService::markSuccess($transaction);
+            if ($transaction) {
+                $transaction->transaction_date = $deposit->transaction_date;
+                $transaction->save();
+            }
         }
     }
 

@@ -38,7 +38,7 @@ class DepositController extends Controller
             'amount' => 'required|numeric',
             'received_method' => 'nullable|max:100',
             'received_from' => 'nullable|max:100',
-            'created_at' => 'nullable|date',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $account = Account::findOrFail($r->account);
@@ -51,7 +51,7 @@ class DepositController extends Controller
             'bank_name' => $r->bank_name,
             'description' => $r->description,
             'status' => 'pending',
-            'transaction_date' => $r->created_at ?: Carbon::now(),
+            'transaction_date' => $r->transaction_date ?: Carbon::now(),
             'addedby_id' => Auth::id(),
         ]);
 
@@ -74,12 +74,14 @@ class DepositController extends Controller
         $r->validate([
             'received_method' => 'nullable|max:100',
             'received_from' => 'nullable|max:100',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $deposit->received_method = $r->received_method;
         $deposit->received_from = $r->received_from;
         $deposit->description = $r->description;
         $deposit->bank_name = $r->bank_name;
+        $deposit->transaction_date = $r->transaction_date ?: $deposit->transaction_date;
         $deposit->editedby_id = Auth::id();
         $deposit->save();
 

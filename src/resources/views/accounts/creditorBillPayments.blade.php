@@ -121,7 +121,7 @@
     	   <div class="modal-body">
     	   		<div class="form-group">
     			    <label for="name">Date* </label>
-                    <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" required="">
+                    <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" required="">
              	</div>
     	   		<div class="form-group">
     			    <label for="name">Creditor* </label>

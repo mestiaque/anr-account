@@ -27,7 +27,7 @@ class BalanceTransferController extends Controller
             'form_account' => 'required|numeric',
             'to_account' => 'required|numeric|different:form_account',
             'amount' => 'required|numeric',
-            'created_at' => 'nullable|date',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $fromAccount = Account::findOrFail($r->form_account);
@@ -44,7 +44,7 @@ class BalanceTransferController extends Controller
             'amount' => $r->amount,
             'description' => $r->description,
             'status' => 'success',
-            'transaction_date' => $r->created_at ?: Carbon::now(),
+            'transaction_date' => $r->transaction_date ?: Carbon::now(),
             'addedby_id' => Auth::id(),
         ]);
 

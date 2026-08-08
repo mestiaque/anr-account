@@ -38,7 +38,7 @@ class WithdrawalController extends Controller
             'payment' => 'nullable|numeric',
             'amount' => 'required|numeric',
             'bank_name' => 'nullable|max:100',
-            'created_at' => 'nullable|date',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $account = Account::findOrFail($r->account);
@@ -55,7 +55,7 @@ class WithdrawalController extends Controller
             'bank_name' => $r->bank_name,
             'description' => $r->description,
             'status' => 'success',
-            'transaction_date' => $r->created_at ?: Carbon::now(),
+            'transaction_date' => $r->transaction_date ?: Carbon::now(),
             'addedby_id' => Auth::id(),
         ]);
 
@@ -68,11 +68,13 @@ class WithdrawalController extends Controller
         $r->validate([
             'payment' => 'nullable|numeric',
             'bank_name' => 'nullable|max:100',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $withdrawal->payment_method_id = $r->payment;
         $withdrawal->bank_name = $r->bank_name;
         $withdrawal->description = $r->description;
+        $withdrawal->transaction_date = $r->transaction_date ?: $withdrawal->transaction_date;
         $withdrawal->editedby_id = Auth::id();
         $withdrawal->save();
 

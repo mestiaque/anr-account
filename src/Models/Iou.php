@@ -10,13 +10,14 @@ class Iou extends Model
 
     protected $fillable = [
         'iou_no', 'employee_id', 'user_id', 'account_id', 'payment_method_id', 'branch_id',
-        'amount', 'company_name', 'receiver_name', 'description', 'status',
+        'amount', 'company_name', 'receiver_name', 'description', 'status', 'completed_at',
         'transaction_date', 'addedby_id', 'editedby_id', 'legacy_id',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'transaction_date' => 'date',
+        'completed_at' => 'datetime',
     ];
 
     public function account()

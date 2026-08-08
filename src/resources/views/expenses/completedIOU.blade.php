@@ -143,7 +143,7 @@
                 <tbody>
                     @foreach($completedIou as $i=>$Iou)
                     @php
-                        $isOlderThan2Days = $Iou->created_at->lt(\Carbon\Carbon::now()->subDays(7));
+                        $isOlderThan2Days = $Iou->transaction_date && $Iou->transaction_date->lt(\Carbon\Carbon::now()->subDays(7));
                     @endphp
                     <tr>
                         <td>
@@ -159,8 +159,8 @@
                             @endif
                         </td>
 
-                        <td>{{$Iou->created_at->format('d.m.Y')}}</td>
-                        <td>{{$Iou->updated_at->format('d.m.Y')}}</td>
+                        <td>{{$Iou->transaction_date?->format('d.m.Y')}}</td>
+                        <td>{{$Iou->completed_at?->format('d.m.Y') ?? $Iou->updated_at->format('d.m.Y')}}</td>
                         <td>{{ $Iou->company_name ?? '--' }}</td>
                         <td>{{ $Iou->receiver_name ?? '--' }}</td>
                         <td>{{$Iou->employee?$Iou->employee->name:''}}</td>

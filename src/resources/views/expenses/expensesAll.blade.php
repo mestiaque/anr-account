@@ -298,7 +298,7 @@
 
                             </td>
                             <td>{{ str_pad($expense->id, 10, '0', STR_PAD_LEFT) }}</td>
-                            <td>{{$expense->created_at->format('d.m.Y')}}</td>
+                            <td>{{$expense->transaction_date?->format('d.m.Y')}}</td>
                             <td>{{ $expense->company_name ?? '--' }}</td>
                             <td>{{ $expense->receiver_name ?? '--' }}</td>
                             <td>{{$expense->category?$expense?->category->name:''}}</td>
@@ -375,11 +375,11 @@
     	       <div class="row">
     	           <div class="col-md-6 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" min="{{ $lastAudit && $lastAudit->audit_at
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" min="{{ $lastAudit && $lastAudit->audit_at
     ? \Carbon\Carbon::parse($lastAudit->audit_at)->addDay()->format('Y-m-d')
     : now()->format('Y-m-d') }}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                  	<div class="col-md-6 form-group">
@@ -514,7 +514,7 @@
                  	</div>
                  	<div class="col-md-6 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" required="">
+                        <input type="date" class="form-control" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}" required="">
                  	</div>
     	       </div>
     	       <div class="row">
@@ -573,12 +573,12 @@
     	       <div class="row">
     	           <div class="col-md-6 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{$dpm->created_at->format('Y-m-d')}}" 
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{$dpm->transaction_date?->format('Y-m-d')}}"
                         min="{{ $lastAudit && $lastAudit->audit_at
     ? \Carbon\Carbon::parse($lastAudit->audit_at)->addDay()->format('Y-m-d')
     : '' }}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                  	<div class="col-md-6 form-group">
@@ -903,7 +903,7 @@
 
             <div class="date-field">
                 <span class="date-label">Date:</span>
-                <input type="text" class="input-underline" style="width: 100px;" value="{{$exp->created_at->format('d.m.Y')}}">
+                <input type="text" class="input-underline" style="width: 100px;" value="{{$exp->transaction_date?->format('d.m.Y')}}">
             </div>
 
             <div class="form-section" style="margin-top: 1rem !important">

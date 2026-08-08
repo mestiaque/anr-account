@@ -281,7 +281,7 @@
                         @foreach($expenses as $expense)
                         <tr>
                             <td>{{ str_pad($expense->id, 10, '0', STR_PAD_LEFT) }}</td>
-                            <td>{{$expense->created_at->format('d.m.Y')}}</td>
+                            <td>{{$expense->transaction_date?->format('d.m.Y')}}</td>
                             <td>{{$expense->company_name}}</td>
                             <td>{{$expense->receiver_name}}</td>
                             <td>{{$expense->category?$expense->category->name:'not found'}}</td>

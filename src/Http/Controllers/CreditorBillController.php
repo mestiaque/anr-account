@@ -14,7 +14,7 @@ class CreditorBillController extends Controller
     public function store(Request $r, Creditor $creditor)
     {
         $r->validate([
-            'created_at' => 'nullable|date',
+            'transaction_date' => 'nullable|date',
             'title' => 'required|max:150',
             'amount' => 'required|numeric',
             'description' => 'nullable|max:1000',
@@ -26,7 +26,7 @@ class CreditorBillController extends Controller
             'title' => $r->title,
             'amount' => $r->amount,
             'description' => $r->description,
-            'transaction_date' => $r->created_at ?: Carbon::now(),
+            'transaction_date' => $r->transaction_date ?: Carbon::now(),
             'created_by' => Auth::id(),
         ]);
 
@@ -40,14 +40,14 @@ class CreditorBillController extends Controller
             'title' => 'required|max:150',
             'amount' => 'required|numeric',
             'description' => 'nullable|max:1000',
-            'created_at' => 'nullable|date',
+            'transaction_date' => 'nullable|date',
         ]);
 
         $creditorBill->title = $r->title;
         $creditorBill->amount = $r->amount;
         $creditorBill->description = $r->description;
-        if ($r->created_at) {
-            $creditorBill->transaction_date = $r->created_at;
+        if ($r->transaction_date) {
+            $creditorBill->transaction_date = $r->transaction_date;
         }
         $creditorBill->editedby_id = Auth::id();
         $creditorBill->save();

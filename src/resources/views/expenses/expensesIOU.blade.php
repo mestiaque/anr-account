@@ -165,6 +165,7 @@
                                 @endcan
                             </th>
                             <th style="min-width: 100px;">I.O.U Date</th>
+                            <th style="min-width: 100px;">Complete Date</th>
                             <th style="min-width: 100px;">Company</th>
                             <th style="min-width: 100px;">Receiver</th>
                             <th style="min-width: 120px;">Employee</th>
@@ -179,7 +180,7 @@
                     <tbody>
                         @foreach($expenseIou as $i=>$Iou)
                         @php
-                            $isOlderThan2Days = $Iou->created_at->lt(\Carbon\Carbon::now()->subDays(7));
+                            $isOlderThan2Days = $Iou->transaction_date && $Iou->transaction_date->lt(\Carbon\Carbon::now()->subDays(7));
                         @endphp
                         <tr @if($isOlderThan2Days) style="background-color: #ffebeb;" @endif>
                             <td>
@@ -206,7 +207,8 @@
                                 </span>
                                 @endif
                             </td>
-                            <td>{{$Iou->created_at->format('d.m.Y')}}</td>
+                            <td>{{$Iou->transaction_date?->format('d.m.Y')}}</td>
+                            <td>{{$Iou->completed_at?->format('d.m.Y') ?: '-'}}</td>
                             <td>{{ $Iou->company_name ?? '--' }}</td>
                             <td>{{ $Iou->receiver_name ?? '--' }}</td>
                             <td>{{$Iou->employee?$Iou->employee->name:''}}</td>
@@ -247,7 +249,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="7" class="text-right">Total Amount:</th>
+                            <th colspan="8" class="text-right">Total Amount:</th>
                             <th>{{ priceFormat($expenseIou->sum('amount')) }}</th>
                             <th colspan="3"></th>
                         </tr>
@@ -278,9 +280,9 @@
     	       <div class="row">
     	           <div class="col-md-12 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}"  required="">
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                  	<div class="col-md-6 form-group">
@@ -397,9 +399,9 @@
     	       <div class="row">
     	           <div class="col-md-12 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{$dpm->created_at->format('Y-m-d')}}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{$dpm->transaction_date?->format('Y-m-d')}}"  required="">
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                     <div class="col-md-6 form-group">
@@ -502,11 +504,8 @@
                          </div>
                  	</div>
                     <div class="col-md-6 form-group">
-                        <label for="name">Publish Date*</label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" value="{{$dpm->created_at->format('Y-m-d')}}" name="created_at" required="">
-                        @if ($errors->has('created_at'))
-    					<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
-    					@endif
+                        <label for="name">Publish Date</label>
+                        <input type="date" class="form-control" value="{{$dpm->created_at?->format('Y-m-d')}}" disabled="">
                     </div>
              	</div>
     	   </div>
@@ -707,7 +706,7 @@
 
             <div class="date-field">
                 <span class="date-label">Date:</span>
-                <input type="text" class="input-underline" style="width: 100px;" value="{{$dpm->created_at->format('d.m.Y')}}">
+                <input type="text" class="input-underline" style="width: 100px;" value="{{$dpm->transaction_date?->format('d.m.Y')}}">
             </div>
 
             <div class="form-section">

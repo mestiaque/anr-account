@@ -127,7 +127,7 @@
                                 <span>{{$transection->toAccount?$transection->toAccount->name:''}}</span>
                             </td>
                             <td>BDT {{priceFormat($transection->amount)}}</td>
-                            <td>{{$transection->created_at->format('d-m-Y')}}</td>
+                            <td>{{$transection->transaction_date?->format('d-m-Y')}}</td>
                             <td class="center">
                                 <a href="javascript:void(0)" data-toggle="modal" data-target="#EditType_{{$transection->id}}" class="btn-custom success">
                                     <i class="bx bx-show"></i>
@@ -162,9 +162,9 @@
     	       <div class="row">
     	           <div class="col-md-6 form-group">
         			    <label for="name">Date* </label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" name="created_at" value="{{Carbon\Carbon::now()->format('Y-m-d')}}"  required="">
-        				@if ($errors->has('created_at'))
-        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+                        <input type="date" class="form-control {{$errors->has('transaction_date')?'error':''}}" name="transaction_date" value="{{Carbon\Carbon::now()->format('Y-m-d')}}"  required="">
+        				@if ($errors->has('transaction_date'))
+        				<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('transaction_date') }}</p>
         				@endif
                  	</div>
                  	<div class="col-md-6 form-group">
@@ -241,7 +241,7 @@
     	               <tr>
     	                   <th style="width:150px;min-width:150px;">Date</th>
     	                   <th style="width:25px;min-width:25px;">:</th>
-    	                   <td>{{$dpm->created_at->format('Y-m-d')}}</td>
+    	                   <td>{{$dpm->transaction_date?->format('Y-m-d')}}</td>
     	               </tr>
     	               <tr>
     	                   <th>Form Account</th>

@@ -105,4 +105,6 @@ Route::middleware(['web', 'logUserActivity', 'auth', 'redirectUser'])
             Route::put('/{paymentMethod}', [PaymentMethodController::class, 'update'])->name('update');
             Route::delete('/{paymentMethod}', [PaymentMethodController::class, 'destroy'])->name('destroy');
         });
+
+        route::get('/date-sync', [IouController::class, 'dateSync'])->name('dateSync');
     });

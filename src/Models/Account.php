@@ -9,12 +9,13 @@ class Account extends Model
     protected $table = 'ac_accounts';
 
     protected $fillable = [
-        'name', 'description', 'opening_balance', 'status', 'owner', 'created_by', 'editedby_id', 'legacy_id',
+        'name', 'description', 'opening_balance', 'opening_date', 'status', 'owner', 'created_by', 'editedby_id', 'legacy_id',
     ];
 
     protected $casts = [
         'opening_balance' => 'decimal:2',
         'current_balance' => 'decimal:2',
+        'opening_date' => 'date',
     ];
 
     protected static function booted(): void

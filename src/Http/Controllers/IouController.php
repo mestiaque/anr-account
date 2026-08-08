@@ -3,9 +3,15 @@
 namespace ME\Accounts\Http\Controllers;
 
 use ME\Accounts\Models\Account;
+use ME\Accounts\Models\BalanceTransfer;
 use ME\Accounts\Models\Branch;
+use ME\Accounts\Models\CreditorBill;
+use ME\Accounts\Models\CreditorBillPayment;
+use ME\Accounts\Models\Deposit;
+use ME\Accounts\Models\Expense;
 use ME\Accounts\Models\Iou;
 use ME\Accounts\Models\PaymentMethod;
+use ME\Accounts\Models\Withdrawal;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -60,7 +66,7 @@ class IouController extends Controller
             'amount' => 'required|numeric',
             'company_name' => 'nullable|max:100',
             'receiver_name' => 'nullable|max:100',
-            'created_at' => 'nullable|date',
+            'transaction_date' => 'required|date',
         ]);
 
         $account = Account::findOrFail($r->account);
@@ -85,7 +91,7 @@ class IouController extends Controller
             'company_name' => $r->company_name,
             'receiver_name' => $r->receiver_name,
             'status' => 'pending',
-            'transaction_date' => $r->created_at ?: Carbon::now(),
+            'transaction_date' => $r->transaction_date ?: Carbon::now(),
             'addedby_id' => Auth::id(),
         ]);
 
@@ -102,6 +108,7 @@ class IouController extends Controller
             'amount' => 'required|numeric',
             'company_name' => 'nullable|max:100',
             'receiver_name' => 'nullable|max:100',
+            'transaction_date' => 'required|date',
         ]);
 
         $employeeUser = $r->employee_id
@@ -116,7 +123,14 @@ class IouController extends Controller
         $iou->description = $r->description;
         $iou->company_name = $r->company_name;
         $iou->receiver_name = $r->receiver_name;
-        $iou->status = $r->status ? 'completed' : 'pending';
+        $newStatus = $r->status ? 'completed' : 'pending';
+        if ($newStatus === 'completed' && $iou->status !== 'completed') {
+            $iou->completed_at = Carbon::now();
+        } elseif ($newStatus !== 'completed') {
+            $iou->completed_at = null;
+        }
+        $iou->status = $newStatus;
+        $iou->transaction_date = $r->transaction_date ?: $iou->transaction_date;
         $iou->editedby_id = Auth::id();
         $iou->save();
 
@@ -164,5 +178,69 @@ class IouController extends Controller
         $branches = Branch::where('status', 'active')->orderBy('name')->get();
 
         return view('erp-accounts::expenses.expenseIOUReports', compact('expenses', 'users', 'from', 'to', 'branches', 'filterAccounts'));
+    }
+
+    public function dateSync(){
+
+        $ious = Iou::all();
+        foreach ($ious as $iou) {
+            $iou->update([
+                'transaction_date' => $iou->transaction_date ?? $iou->created_at,
+            ]);
+            if( $iou->status === 'completed' && !$iou->completed_at) {
+                $iou->update(['completed_at' => $iou->updated_at]);
+            }
+        }
+
+        $expenses = Expense::all();
+        foreach ($expenses as $expense) {
+            $expense->update([
+                'transaction_date' => $expense->transaction_date ?? $expense->created_at,
+            ]);
+        }
+
+        $deposits = Deposit::all();
+        foreach ($deposits as $deposit) {
+            $deposit->update([
+                'transaction_date' => $deposit->transaction_date ?? $deposit->created_at,
+            ]);
+        }
+
+        $withdrawals = Withdrawal::all();
+        foreach ($withdrawals as $withdrawal) {
+            $withdrawal->update([
+                'transaction_date' => $withdrawal->transaction_date ?? $withdrawal->created_at,
+            ]);
+        }
+
+        $balanceTransfers = BalanceTransfer::all();
+        foreach ($balanceTransfers as $balanceTransfer) {
+            $balanceTransfer->update([
+                'transaction_date' => $balanceTransfer->transaction_date ?? $balanceTransfer->created_at,
+            ]);
+        }
+
+        $creditorBills = CreditorBill::all();
+        foreach ($creditorBills as $creditorBill) {
+            $creditorBill->update([
+                'transaction_date' => $creditorBill->transaction_date ?? $creditorBill->created_at,
+            ]);
+        }
+
+        $creditorBillPayments = CreditorBillPayment::all();
+        foreach ($creditorBillPayments as $creditorBillPayment) {
+            $creditorBillPayment->update([
+                'transaction_date' => $creditorBillPayment->transaction_date ?? $creditorBillPayment->created_at,
+            ]);
+        }
+
+        $accounts = Account::all();
+        foreach ($accounts as $account) {
+            $account->update([
+                'opening_date' => $account->opening_date ?? $account->created_at,
+            ]);
+        }
+
+        print("Date synchronization completed successfully.");
     }
 }

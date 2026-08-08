@@ -34,14 +34,23 @@ class ExpenseObserver
 
     public function updated(Expense $expense): void
     {
-        if (!$expense->wasChanged('amount')) {
+        if (!$expense->wasChanged('amount') && !$expense->wasChanged('transaction_date')) {
             return;
         }
 
         $transaction = Transaction::where('source_type', 'expense')->where('source_id', $expense->id)->first();
 
-        if ($transaction) {
+        if (!$transaction) {
+            return;
+        }
+
+        if ($expense->wasChanged('amount')) {
             LedgerService::adjustAmount($transaction, (float) $expense->amount);
+        }
+
+        if ($expense->wasChanged('transaction_date')) {
+            $transaction->transaction_date = $expense->transaction_date;
+            $transaction->save();
         }
     }
 

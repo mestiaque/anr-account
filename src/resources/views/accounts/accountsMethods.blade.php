@@ -90,7 +90,7 @@
                             <td>
                                 <b>Title:</b><span> {{$method->name}}</span><br>
                                 <b>Owner:</b><span> {{$method->ownerUser?$method->ownerUser->name:'No Owner'}}</span><br>
-                                <b>Opening Date:</b> {{$method->created_at->format('d-m-Y')}}
+                                <b>Opening Date:</b> {{$method->opening_date?->format('d-m-Y')}}
                                 @if($method->status=='active')
                                 <span style="color: #43d39e;font-size: 20px;line-height: 20px;">
                                     <i class="bx bx-check-circle"></i>
@@ -272,10 +272,10 @@
                          </div>
                  	</div>
                     <div class="col-md-6 form-group">
-                        <label for="name">Publish Date*</label>
-                        <input type="date" class="form-control {{$errors->has('created_at')?'error':''}}" value="{{$dpm->created_at->format('Y-m-d')}}" name="created_at" required="">
-                        @if ($errors->has('created_at'))
-    					<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('created_at') }}</p>
+                        <label for="name">Opening Date*</label>
+                        <input type="date" class="form-control {{$errors->has('opening_date')?'error':''}}" value="{{$dpm->opening_date?->format('Y-m-d')}}" name="opening_date" required="">
+                        @if ($errors->has('opening_date'))
+    					<p style="color: red; margin: 0; font-size: 10px;">{{ $errors->first('opening_date') }}</p>
     					@endif
                     </div>
              	</div>
