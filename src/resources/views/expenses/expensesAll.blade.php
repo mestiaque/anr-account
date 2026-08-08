@@ -359,7 +359,6 @@
 </div>
 </div>
 {{-- @dd($lastAudit->audit_at) --}}
-@isset(json_decode(Auth::user()->permission->permission, true)['expenses']['add'])
 <!-- Add Modal -->
  <div class="modal fade text-left" id="AddExpense" tabindex="-1" role="dialog">
    <div class="modal-dialog" role="document">
@@ -704,7 +703,6 @@
    </div>
  </div>
 @endforeach
-@endisset
 <!--View Modal -->
 @foreach($expenses as $i=>$exp)
  <div class="modal fade text-left" id="ViewExpense_{{$exp->id}}" tabindex="-1" role="dialog">
