@@ -8,5 +8,5 @@ class Branch extends Model
 {
     protected $table = 'ac_branches';
 
-    protected $fillable = ['name', 'bn_name', 'status', 'addedby_id', 'editedby_id'];
+    protected $fillable = ['name', 'bn_name', 'status', 'addedby_id', 'editedby_id', 'legacy_id'];
 }

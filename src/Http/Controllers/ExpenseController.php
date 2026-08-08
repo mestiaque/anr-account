@@ -3,7 +3,11 @@
 namespace ME\Accounts\Http\Controllers;
 
 use ME\Accounts\Models\Account;
+use ME\Accounts\Models\Branch;
 use ME\Accounts\Models\Expense;
+use ME\Accounts\Models\ExpenseCategory;
+use ME\Accounts\Models\PaymentMethod;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +16,12 @@ class ExpenseController extends Controller
 {
     public function index(Request $r)
     {
+        if ($r->action == 5 && $r->checkid) {
+            Expense::whereIn('id', $r->checkid)->get()->each->delete();
+            Session()->flash('success', 'Action Successfully Completed!');
+            return redirect()->back();
+        }
+
         $from = $r->startDate ?? Carbon::now()->format('Y-m-d');
         $to = $r->endDate ?? Carbon::now()->format('Y-m-d');
 
@@ -26,7 +36,22 @@ class ExpenseController extends Controller
             ->paginate(25)
             ->appends($r->all());
 
-        return view(adminTheme() . 'expenses.expensesAll', compact('expenses', 'from', 'to'));
+        $report = [
+            'today_expenses' => numberFormat(Expense::where('status', '<>', 'temp')->whereDate('transaction_date', Carbon::today())->sum('amount'), 2),
+            'monthly_expenses' => numberFormat(Expense::where('status', '<>', 'temp')->whereMonth('transaction_date', Carbon::now()->month)->whereYear('transaction_date', Carbon::now()->year)->sum('amount'), 2),
+            'filtered_expenses' => numberFormat(Expense::where('status', '<>', 'temp')->whereDate('transaction_date', '>=', $from)->whereDate('transaction_date', '<=', $to)->sum('amount'), 2),
+            'filtered_total' => numberFormat((clone $expenses)->sum('amount'), 2),
+        ];
+
+        $expenseTypes = ExpenseCategory::where('status', 'active')->orderBy('name')->get();
+        $paymentMethods = PaymentMethod::where('status', 'active')->orderBy('name')->get();
+        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
+        $filterAccounts = $accountMethods;
+        $branches = Branch::where('status', 'active')->orderBy('name')->get();
+        $creditors = User::filterByType('supplier')->where('status', 1)->orderBy('name')->get();
+        $lastAudit = Expense::whereNotNull('audit_at')->latest()->first();
+
+        return view('erp-accounts::expenses.expensesAll', compact('expenses', 'report', 'expenseTypes', 'paymentMethods', 'accountMethods', 'branches', 'to', 'from', 'lastAudit', 'filterAccounts', 'creditors'));
     }
 
     public function store(Request $r)

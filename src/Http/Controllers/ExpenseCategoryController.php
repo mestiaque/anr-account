@@ -10,6 +10,23 @@ class ExpenseCategoryController extends Controller
 {
     public function index(Request $r)
     {
+        if ($r->action && $r->checkid) {
+            $categories = ExpenseCategory::whereIn('id', $r->checkid)->get();
+            foreach ($categories as $category) {
+                if ($r->action == 1) {
+                    $category->status = 'active';
+                    $category->save();
+                } elseif ($r->action == 2) {
+                    $category->status = 'inactive';
+                    $category->save();
+                } elseif ($r->action == 5) {
+                    $category->delete();
+                }
+            }
+            Session()->flash('success', 'Action Successfully Completed!');
+            return redirect()->back();
+        }
+
         $categories = ExpenseCategory::where('status', '<>', 'temp')
             ->when($r->search, fn ($q) => $q->where('name', 'LIKE', '%' . $r->search . '%'))
             ->when($r->status, fn ($q) => $q->where('status', $r->status))
@@ -17,7 +34,7 @@ class ExpenseCategoryController extends Controller
             ->paginate(25)
             ->appends(['search' => $r->search, 'status' => $r->status]);
 
-        return view(adminTheme() . 'expenses.expensesTypes', compact('categories'));
+        return view('erp-accounts::expenses.expensesTypes', compact('categories'));
     }
 
     public function store(Request $r)

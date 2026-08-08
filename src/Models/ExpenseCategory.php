@@ -8,5 +8,5 @@ class ExpenseCategory extends Model
 {
     protected $table = 'ac_expense_categories';
 
-    protected $fillable = ['name', 'description', 'status', 'addedby_id', 'editedby_id'];
+    protected $fillable = ['name', 'description', 'status', 'addedby_id', 'editedby_id', 'legacy_id'];
 }

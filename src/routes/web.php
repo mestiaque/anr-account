@@ -14,8 +14,8 @@ use ME\Accounts\Http\Controllers\WithdrawalController;
 // Fully independent route set — no Route::any, one dedicated route per action.
 // Mirrors the host app's admin/* URL + 'admin.' route-name convention so
 // existing blade views only need their route() targets repointed, nothing else.
-Route::middleware(['logUserActivity', 'auth', 'redirectUser'])
-    ->prefix('admin')
+Route::middleware(['web', 'logUserActivity', 'auth', 'redirectUser'])
+    ->prefix('admin/v2')
     ->name('admin.')
     ->group(function () {
 

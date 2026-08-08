@@ -3,6 +3,7 @@
 namespace ME\Accounts\Http\Controllers;
 
 use ME\Accounts\Models\Account;
+use ME\Accounts\Models\PaymentMethod;
 use ME\Accounts\Models\Withdrawal;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -12,13 +13,22 @@ class WithdrawalController extends Controller
 {
     public function index(Request $r)
     {
-        $withdrawals = Withdrawal::where('status', '<>', 'temp')
+        if ($r->action == 5 && $r->checkid) {
+            Withdrawal::whereIn('id', $r->checkid)->get()->each->delete();
+            Session()->flash('success', 'Action Successfully Completed!');
+            return redirect()->back();
+        }
+
+        $transections = Withdrawal::where('status', '<>', 'temp')
             ->when($r->search, fn ($q) => $q->where('withdrawal_no', 'LIKE', '%' . $r->search . '%'))
             ->when($r->account, fn ($q) => $q->where('account_id', $r->account))
             ->latest()
             ->paginate(10);
 
-        return view(adminTheme() . 'accounts.withdrawal', compact('withdrawals'));
+        $paymentMethods = PaymentMethod::where('status', 'active')->orderBy('name')->get();
+        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
+
+        return view('erp-accounts::accounts.withdrawal', compact('transections', 'paymentMethods', 'accountMethods'));
     }
 
     public function store(Request $r)

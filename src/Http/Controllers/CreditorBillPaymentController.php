@@ -4,6 +4,8 @@ namespace ME\Accounts\Http\Controllers;
 
 use ME\Accounts\Models\Account;
 use ME\Accounts\Models\CreditorBillPayment;
+use ME\Accounts\Models\PaymentMethod;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +19,11 @@ class CreditorBillPaymentController extends Controller
             ->latest()
             ->paginate(25);
 
-        return view(adminTheme() . 'accounts.creditorBillPayments', compact('payments'));
+        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
+        $paymentMethods = PaymentMethod::where('status', 'active')->orderBy('name')->get();
+        $creditors = User::filterByType('supplier')->where('status', 1)->orderBy('name')->get();
+
+        return view('erp-accounts::accounts.creditorBillPayments', compact('payments', 'accountMethods', 'paymentMethods', 'creditors'));
     }
 
     public function store(Request $r)

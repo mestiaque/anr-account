@@ -11,7 +11,7 @@ class Expense extends Model
     protected $fillable = [
         'expense_no', 'category_id', 'account_id', 'payment_method_id', 'branch_id',
         'amount', 'company_name', 'receiver_name', 'receiver_mobile', 'description',
-        'status', 'audit_at', 'audit_by', 'transaction_date', 'addedby_id', 'editedby_id',
+        'status', 'audit_at', 'audit_by', 'transaction_date', 'addedby_id', 'editedby_id', 'legacy_id',
     ];
 
     protected $casts = [

@@ -8,5 +8,5 @@ class PaymentMethod extends Model
 {
     protected $table = 'ac_payment_methods';
 
-    protected $fillable = ['name', 'description', 'status', 'addedby_id', 'editedby_id'];
+    protected $fillable = ['name', 'description', 'status', 'addedby_id', 'editedby_id', 'legacy_id'];
 }

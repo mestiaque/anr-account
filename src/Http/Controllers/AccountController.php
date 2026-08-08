@@ -4,6 +4,7 @@ namespace ME\Accounts\Http\Controllers;
 
 use ME\Accounts\Models\Account;
 use ME\Accounts\Models\Transaction;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +20,9 @@ class AccountController extends Controller
             ->paginate(25)
             ->appends(['search' => $r->search, 'status' => $r->status]);
 
-        return view(adminTheme() . 'accounts.accountsMethods', compact('accounts'));
+        $adminUsers = User::filterByType('customer')->where('status', 1)->orderBy('name')->select(['id', 'name', 'mobile', 'email'])->get();
+
+        return view('erp-accounts::accounts.accountsMethods', compact('accounts', 'adminUsers'));
     }
 
     public function store(Request $r)
@@ -27,15 +30,15 @@ class AccountController extends Controller
         $r->validate([
             'name' => 'required|max:100',
             'description' => 'nullable|max:1000',
-            'opening_balance' => 'nullable|numeric',
+            'account_owner' => 'required|numeric',
         ]);
 
         Account::create([
             'name' => $r->name,
             'description' => $r->description,
-            'opening_balance' => $r->opening_balance ?: 0,
+            'opening_balance' => 0,
             'status' => 'active',
-            'addedby_id' => Auth::id(),
+            'addedby_id' => $r->account_owner,
         ]);
 
         Session()->flash('success', 'Account successfully created');
@@ -47,11 +50,15 @@ class AccountController extends Controller
         $r->validate([
             'name' => 'required|max:100',
             'description' => 'nullable|max:1000',
+            'account_owner' => 'required|numeric',
+            'created_at' => 'required|date',
         ]);
 
         $account->name = $r->name;
         $account->description = $r->description;
+        $account->addedby_id = $r->account_owner;
         $account->status = $r->status ? 'active' : 'inactive';
+        $account->created_at = $r->created_at;
         $account->editedby_id = Auth::id();
         $account->save();
 
@@ -92,7 +99,7 @@ class AccountController extends Controller
         $availableBalance = $balance;
         $method = $account; // keep legacy blade variable name
 
-        return view(adminTheme() . 'accounts.accountsMethodsView', compact('method', 'openingBalance', 'availableBalance', 'transections', 'from', 'to'));
+        return view('erp-accounts::accounts.accountsMethodsView', compact('method', 'openingBalance', 'availableBalance', 'transections', 'from', 'to'));
     }
 
     protected function balanceAsOf(Account $account, Carbon $before): float

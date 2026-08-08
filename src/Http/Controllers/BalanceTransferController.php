@@ -12,11 +12,13 @@ class BalanceTransferController extends Controller
 {
     public function index(Request $r)
     {
-        $transfers = BalanceTransfer::when($r->account, fn ($q) => $q->where('from_account_id', $r->account)->orWhere('to_account_id', $r->account))
+        $transections = BalanceTransfer::when($r->account, fn ($q) => $q->where('from_account_id', $r->account)->orWhere('to_account_id', $r->account))
             ->latest()
             ->paginate(10);
 
-        return view(adminTheme() . 'accounts.balanceTransfers', compact('transfers'));
+        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
+
+        return view('erp-accounts::accounts.balanceTransfers', compact('transections', 'accountMethods'));
     }
 
     public function store(Request $r)

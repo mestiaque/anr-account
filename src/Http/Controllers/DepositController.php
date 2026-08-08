@@ -12,13 +12,23 @@ class DepositController extends Controller
 {
     public function index(Request $r)
     {
-        $deposits = Deposit::where('status', '<>', 'temp')
+        if ($r->action == 5 && $r->checkid) {
+            Deposit::whereIn('id', $r->checkid)->get()->each->delete();
+            Session()->flash('success', 'Action Successfully Completed!');
+            return redirect()->back();
+        }
+
+        $query = Deposit::where('status', '<>', 'temp')
             ->when($r->search, fn ($q) => $q->where('deposit_no', 'LIKE', '%' . $r->search . '%'))
             ->when($r->account, fn ($q) => $q->where('account_id', $r->account))
-            ->latest()
-            ->paginate(10);
+            ->when($r->startDate, fn ($q) => $q->whereDate('transaction_date', '>=', $r->startDate))
+            ->when($r->endDate, fn ($q) => $q->whereDate('transaction_date', '<=', $r->endDate));
 
-        return view(adminTheme() . 'accounts.deposits', compact('deposits'));
+        $totalAmount = (clone $query)->sum('amount');
+        $transections = $query->latest()->paginate(10);
+        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
+
+        return view('erp-accounts::accounts.deposits', compact('transections', 'totalAmount', 'accountMethods'));
     }
 
     public function store(Request $r)

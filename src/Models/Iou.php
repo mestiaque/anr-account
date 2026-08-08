@@ -11,7 +11,7 @@ class Iou extends Model
     protected $fillable = [
         'iou_no', 'employee_id', 'user_id', 'account_id', 'payment_method_id', 'branch_id',
         'amount', 'company_name', 'receiver_name', 'description', 'status',
-        'transaction_date', 'addedby_id', 'editedby_id',
+        'transaction_date', 'addedby_id', 'editedby_id', 'legacy_id',
     ];
 
     protected $casts = [

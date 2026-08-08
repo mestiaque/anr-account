@@ -3,7 +3,9 @@
 namespace ME\Accounts\Http\Controllers;
 
 use ME\Accounts\Models\Account;
+use ME\Accounts\Models\Branch;
 use ME\Accounts\Models\Iou;
+use ME\Accounts\Models\PaymentMethod;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -13,7 +15,13 @@ class IouController extends Controller
 {
     public function index(Request $r)
     {
-        $ious = Iou::whereNotIn('status', ['temp', 'completed'])
+        if ($r->action == 5 && $r->checkid) {
+            Iou::whereIn('id', $r->checkid)->get()->each->delete();
+            Session()->flash('success', 'Action Successfully Completed!');
+            return redirect()->back();
+        }
+
+        $expenseIou = Iou::whereNotIn('status', ['temp', 'completed'])
             ->when($r->search, fn ($q) => $q->where('employee_id', 'LIKE', '%' . $r->search . '%')
                 ->orWhere('company_name', 'LIKE', '%' . $r->search . '%')
                 ->orWhere('receiver_name', 'LIKE', '%' . $r->search . '%'))
@@ -21,17 +29,25 @@ class IouController extends Controller
             ->latest()
             ->get();
 
-        return view(adminTheme() . 'expenses.expensesIOU', compact('ious'));
+        $paymentMethods = PaymentMethod::where('status', 'active')->orderBy('name')->get();
+        $accountMethods = Account::where('status', 'active')->orderBy('name')->get();
+        $filterAccounts = $accountMethods;
+        $branches = Branch::where('status', 'active')->orderBy('name')->get();
+        $users = User::where('status', 1)->orderBy('name')->get();
+
+        return view('erp-accounts::expenses.expensesIOU', compact('expenseIou', 'paymentMethods', 'accountMethods', 'filterAccounts', 'branches', 'users'));
     }
 
     public function completed(Request $r)
     {
-        $ious = Iou::where('status', 'completed')
-            ->when($r->account_id, fn ($q) => $q->where('account_id', $r->account_id))
-            ->orderBy('updated_at', 'desc')
-            ->paginate(50);
+        $query = Iou::where('status', 'completed')
+            ->when($r->account_id, fn ($q) => $q->where('account_id', $r->account_id));
 
-        return view(adminTheme() . 'expenses.completedIOU', compact('ious'));
+        $totalAmount = (clone $query)->sum('amount');
+        $completedIou = $query->orderBy('updated_at', 'desc')->paginate(50);
+        $filterAccounts = Account::where('status', 'active')->orderBy('name')->get();
+
+        return view('erp-accounts::expenses.completedIOU', compact('completedIou', 'totalAmount', 'filterAccounts'));
     }
 
     public function store(Request $r)

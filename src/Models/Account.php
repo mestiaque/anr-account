@@ -9,7 +9,7 @@ class Account extends Model
     protected $table = 'ac_accounts';
 
     protected $fillable = [
-        'name', 'description', 'opening_balance', 'status', 'addedby_id', 'editedby_id',
+        'name', 'description', 'opening_balance', 'status', 'addedby_id', 'editedby_id', 'legacy_id',
     ];
 
     protected $casts = [
@@ -24,6 +24,11 @@ class Account extends Model
                 $account->current_balance = $account->opening_balance ?? 0;
             }
         });
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'addedby_id');
     }
 
     public function transactions()

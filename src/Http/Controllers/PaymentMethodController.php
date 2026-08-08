@@ -16,7 +16,7 @@ class PaymentMethodController extends Controller
             ->paginate(25)
             ->appends(['search' => $r->search, 'status' => $r->status]);
 
-        return view(adminTheme() . 'accounts.paymentMethods', compact('paymentMethods'));
+        return view('erp-accounts::accounts.paymentMethods', compact('paymentMethods'));
     }
 
     public function store(Request $r)

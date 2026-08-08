@@ -3,6 +3,8 @@
 namespace ME\Accounts;
 
 use Illuminate\Support\ServiceProvider;
+use ME\Accounts\Console\Commands\MigrateLegacyCommand;
+use ME\Accounts\Console\Commands\ReconcileCommand;
 use ME\Accounts\Models\BalanceTransfer;
 use ME\Accounts\Models\CreditorBillPayment;
 use ME\Accounts\Models\Deposit;
@@ -23,6 +25,14 @@ class ErpAccountsServiceProvider extends ServiceProvider
         if (file_exists(__DIR__ . '/Config/config.php')) {
             $this->mergeConfigFrom(__DIR__ . '/Config/config.php', 'erp-accounts');
         }
+
+        if (file_exists(__DIR__ . '/Config/sidebar.php')) {
+            $this->mergeConfigFrom(__DIR__ . '/Config/sidebar.php', 'erp-accounts-sidebar');
+        }
+
+        if (file_exists(__DIR__ . '/Config/permission.php')) {
+            $this->mergeConfigFrom(__DIR__ . '/Config/permission.php', 'erp-accounts-permission');
+        }
     }
 
     public function boot(): void
@@ -32,6 +42,20 @@ class ErpAccountsServiceProvider extends ServiceProvider
         }
 
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadViewsFrom(__DIR__ . '/resources/views', 'erp-accounts');
+
+        // Merge this package's permission module into the main permission config,
+        // same pattern the HR package uses — additive, never touches existing modules.
+        $accountsPermissions = config('erp-accounts-permission');
+        if ($accountsPermissions && is_array($accountsPermissions)) {
+            $mainPermissions = config('permission', []);
+            if (isset($mainPermissions['modules']) && is_array($mainPermissions['modules'])) {
+                foreach ($accountsPermissions as $moduleKey => $moduleValue) {
+                    $mainPermissions['modules'][$moduleKey] = $moduleValue;
+                }
+                config(['permission' => $mainPermissions]);
+            }
+        }
 
         // The only place account-balance math is allowed to happen.
         Expense::observe(ExpenseObserver::class);
@@ -40,5 +64,12 @@ class ErpAccountsServiceProvider extends ServiceProvider
         Withdrawal::observe(WithdrawalObserver::class);
         BalanceTransfer::observe(BalanceTransferObserver::class);
         CreditorBillPayment::observe(CreditorBillPaymentObserver::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                MigrateLegacyCommand::class,
+                ReconcileCommand::class,
+            ]);
+        }
     }
 }
