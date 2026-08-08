@@ -7,7 +7,7 @@ return [
             'title'      => 'Accounts Management',
             'icon'       => 'fa-solid fa-wallet',
             'icon_color' => 'text-primary',
-            'permission' => '',
+            'permission' => 'ac_expenses',
             'order'      => 11,
             'children'   => [
                 [
