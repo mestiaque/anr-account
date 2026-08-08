@@ -148,6 +148,15 @@ class MigrateLegacyCommand extends Command
                     continue;
                 }
 
+                // category_id=0 is not a real expense category — the legacy creditor-bill-payment
+                // flow (PurchasesController::suppliersAction 'bill-payment-store') creates one of
+                // these as a display-only shadow row alongside the real type=3 Transaction. The
+                // real money movement is migrated separately as an ac_creditor_bill_payments row;
+                // importing this one too double-counts the same payment as an expense.
+                if ((int) $row->category_id === 0) {
+                    continue;
+                }
+
                 $accountId = $this->accountId($row->account_id);
                 if (!$accountId) {
                     continue;
