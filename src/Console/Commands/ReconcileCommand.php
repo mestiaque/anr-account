@@ -100,6 +100,7 @@ class ReconcileCommand extends Command
             $orphaned = [];
 
             $modelClass::when($this->argument('account'), fn ($q) => $q->where('account_id', $this->argument('account')))
+                ->when($sourceType === 'creditor_bill_payment', fn ($q) => $q->whereNull('expense_id'))
                 ->orderBy('created_at')
                 ->chunk(300, function ($chunk) use (&$orphaned, $sourceType) {
                     foreach ($chunk as $record) {
@@ -152,6 +153,7 @@ class ReconcileCommand extends Command
             $mismatches = [];
 
             $modelClass::when($this->argument('account'), fn ($q) => $q->where('account_id', $this->argument('account')))
+                ->when($sourceType === 'creditor_bill_payment', fn ($q) => $q->whereNull('expense_id'))
                 ->orderBy('created_at')
                 ->chunk(300, function ($chunk) use (&$mismatches, $sourceType) {
                     foreach ($chunk as $record) {

@@ -493,7 +493,7 @@
  <div class="modal fade text-left" id="AddCreditorPayment" tabindex="-1" role="dialog">
    <div class="modal-dialog" role="document">
 	 <div class="modal-content">
-	 <form id="creditorPaymentForm" action="{{ route('admin.suppliersAction', ['bill-payment-store', 0]) }}" data-action-template="{{ route('admin.suppliersAction', ['bill-payment-store', '__ID__']) }}" method="post" enctype="multipart/form-data">
+	 <form id="creditorPaymentForm" action="{{ route('admin.creditorBillPayments.store') }}" method="post" enctype="multipart/form-data">
 	   	  @csrf
     	   <div class="modal-header">
     		 <h4 class="modal-title">Creditor Payment</h4>
@@ -520,11 +520,11 @@
     	       <div class="row">
     	           <div class="col-md-6 form-group">
         			    <label for="name">Pay Amount* </label>
-                        <input type="number" step="any" class="form-control" name="pay_amount" placeholder="0.00" required="">
+                        <input type="number" step="any" class="form-control" name="amount" placeholder="0.00" required="">
                  	</div>
                  	<div class="col-md-6 form-group">
         			    <label for="name">Account Method *</label>
-                        <select class="form-control" name="account_id" required="">
+                        <select class="form-control" name="account" required="">
                             <option value="">Select Account</option>
                             @foreach($accountMethods as $method)
                             <option value="{{$method->id}}">{{$method->name}} - BDT {{priceFormat($method->current_balance)}}</option>
@@ -533,26 +533,22 @@
                  	</div>
                  	<div class="col-md-6 form-group">
         			    <label for="name">Payment Method *</label>
-                        <select class="form-control" name="payment_method_id" required="">
+                        <select class="form-control" name="payment" required="">
                             <option value="">Select Method</option>
                             @foreach($paymentMethods as $method)
                             <option value="{{$method->id}}">{{$method->name}}</option>
                             @endforeach
                         </select>
                  	</div>
-                    <div class="col-md-6 form-group">
-        			    <label for="name">Attachtment</label>
-						<input type="file" class="form-control" name="attachment" accept="image/*,application/pdf" style="padding: 3px;">
-                 	</div>
     	       </div>
     			<div class="form-group">
-    				<label for="name">Note</label>
-					<textarea name="note" rows="3" class="form-control" placeholder="Write note here..."></textarea>
+    				<label for="name">Description</label>
+					<textarea name="description" rows="3" class="form-control" placeholder="Write note here..."></textarea>
              	</div>
     	   </div>
     	   <div class="modal-footer">
     		 <button type="button" class="btn grey btn-outline-secondary" data-dismiss="modal">Close </button>
-    		 <button type="submit" class="btn btn-primary" id="creditorPaymentSubmitBtn" disabled><i class="bx bx-plus"></i> Add Payment</button>
+    		 <button type="submit" class="btn btn-primary" id="creditorPaymentSubmitBtn"><i class="bx bx-plus"></i> Add Payment</button>
     	   </div>
 	   </form>
 	 </div>
@@ -1081,18 +1077,6 @@
             var amount = Number($(this).data('amount'));
             var words = toWords(amount);
             $(this).html(words + ' Taka Only');
-        });
-
-        $('#creditorSelect').on('change', function () {
-            var creditorId = $(this).val();
-            var submitBtn = $('#creditorPaymentSubmitBtn');
-            if (creditorId) {
-                var actionUrl = $('#creditorPaymentForm').data('action-template').replace('__ID__', creditorId);
-                $('#creditorPaymentForm').attr('action', actionUrl);
-                submitBtn.prop('disabled', false);
-            } else {
-                submitBtn.prop('disabled', true);
-            }
         });
 
     });

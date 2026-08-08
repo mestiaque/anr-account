@@ -17,8 +17,20 @@ class CreditorBillPaymentObserver
         }
     }
 
+    /**
+     * When a payment is linked to an Expense (expense_id set), that Expense's own
+     * ExpenseObserver is the single source of truth for the balance deduction — this
+     * payment row exists only for the creditor's ledger/reporting and must NOT also
+     * create a transaction, or the amount gets deducted twice. Only a payment with no
+     * linked expense (e.g. created directly, bypassing the expense-linking flow) gets
+     * its own ledger entry here.
+     */
     public function created(CreditorBillPayment $payment): void
     {
+        if ($payment->expense_id) {
+            return;
+        }
+
         $account = Account::find($payment->account_id);
 
         LedgerService::record(
@@ -34,7 +46,7 @@ class CreditorBillPaymentObserver
 
     public function updated(CreditorBillPayment $payment): void
     {
-        if (!$payment->wasChanged('amount')) {
+        if ($payment->expense_id || !$payment->wasChanged('amount')) {
             return;
         }
 
@@ -47,6 +59,10 @@ class CreditorBillPaymentObserver
 
     public function deleted(CreditorBillPayment $payment): void
     {
+        if ($payment->expense_id) {
+            return;
+        }
+
         $transaction = Transaction::where('source_type', 'creditor_bill_payment')->where('source_id', $payment->id)->first();
 
         if ($transaction) {
