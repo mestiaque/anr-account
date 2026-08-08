@@ -102,6 +102,7 @@ class MigrateLegacyCommand extends Command
                 DB::table('ac_creditors')->insert([
                     'legacy_user_id' => $row->id,
                     'name' => $row->name ?: ('#' . $row->id),
+                    'code' => $row->employee_id,
                     'company_name' => $row->company_name ?? null,
                     'mobile' => $row->mobile,
                     'email' => $row->email,

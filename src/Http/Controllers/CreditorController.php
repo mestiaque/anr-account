@@ -65,6 +65,7 @@ class CreditorController extends Controller
     {
         $r->validate([
             'name' => 'required|max:100',
+            'code' => 'nullable|max:50',
             'company_name' => 'nullable|max:150',
             'email_mobile' => 'required|max:100',
             'address' => 'nullable|max:1000',
@@ -74,6 +75,7 @@ class CreditorController extends Controller
 
         Creditor::create([
             'name' => $r->name,
+            'code' => $r->code,
             'company_name' => $r->company_name,
             'email' => $isEmail ? $r->email_mobile : null,
             'mobile' => $isEmail ? null : $r->email_mobile,
@@ -90,6 +92,7 @@ class CreditorController extends Controller
     {
         $r->validate([
             'name' => 'required|max:100',
+            'code' => 'nullable|max:50',
             'company_name' => 'nullable|max:150',
             'mobile' => 'nullable|max:30',
             'email' => 'nullable|email|max:100',
@@ -97,6 +100,7 @@ class CreditorController extends Controller
         ]);
 
         $creditor->name = $r->name;
+        $creditor->code = $r->code;
         $creditor->company_name = $r->company_name;
         $creditor->mobile = $r->mobile;
         $creditor->email = $r->email;

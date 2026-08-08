@@ -99,6 +99,7 @@
                                  @else All @endif
                             </th>
                             <th style="min-width: 200px; width: 200px;">Name</th>
+                            <th style="min-width: 90px;">Code</th>
                             <th style="min-width: 150px;">Company</th>
                             <th style="min-width: 150px;">Mobile/Email</th>
                             <th style="min-width: 200px;">Address</th>
@@ -143,6 +144,7 @@
                             <td>
                                 <a href="{{route('admin.creditors.show',$creditor->id)}}" class="invoice-action-view mr-1">{{$creditor->name}}</a>
                             </td>
+                            <td>{{$creditor->code}}</td>
                             <td>{{$creditor->company_name}}</td>
                             <td>{{$creditor->mobile?:$creditor->email}}</td>
                             <td>{{$creditor->address}}</td>
@@ -170,7 +172,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="10" class="text-center text-muted"><em>No data found</em></td>
+                            <td colspan="11" class="text-center text-muted"><em>No data found</em></td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -181,7 +183,7 @@
                     @endphp
                     <tfoot>
                         <tr>
-                            <th colspan="5" class="text-right">Page Total:</th>
+                            <th colspan="6" class="text-right">Page Total:</th>
                             <th>{{ priceFullFormat($footTotalBill) }}</th>
                             <th style="color:red;">{{ priceFullFormat($footTotalDue) }}</th>
                             <th>{{ priceFullFormat($footTotalPaid) }}</th>
@@ -215,9 +217,13 @@
                     <input type="text" class="form-control {{$errors->has('name')?'error':''}}" name="name" placeholder="Enter Name" required="">
                 </div>
                 <div class="col-md-6 form-group">
-                    <label for="company_name">Company Name</label>
-                    <input type="text" class="form-control" name="company_name" placeholder="Enter Company Name">
+                    <label for="code">Code</label>
+                    <input type="text" class="form-control" name="code" placeholder="Enter Code">
                 </div>
+            </div>
+            <div class="form-group">
+                <label for="company_name">Company Name</label>
+                <input type="text" class="form-control" name="company_name" placeholder="Enter Company Name">
             </div>
             <div class="form-group">
 				<label for="name">Email/Mobile* </label>
@@ -255,6 +261,10 @@
     	   		<div class="form-group">
     			    <label for="name">Name* </label>
                     <input type="text" class="form-control" value="{{$creditor->name}}" name="name" placeholder="Enter Name" required="">
+             	</div>
+    	   		<div class="form-group">
+    			    <label for="code">Code</label>
+                    <input type="text" class="form-control" value="{{$creditor->code}}" name="code" placeholder="Enter Code">
              	</div>
     			<div class="form-group">
     				<label for="name">Company Name</label>

@@ -23,37 +23,85 @@
     </div>
     <div class="card-body">
         @include(adminTheme().'alerts')
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th style="min-width: 100px;">Payment No</th>
-                            <th style="min-width: 200px;">Creditor</th>
-                            <th style="min-width: 150px;">Account</th>
-                            <th style="min-width: 130px;">Amount</th>
-                            <th style="min-width: 120px;">Date</th>
-                            <th style="min-width: 200px;">Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($payments as $payment)
-                        <tr>
-                            <td>{{$payment->payment_no}}</td>
-                            <td>{{$payment->creditor?$payment->creditor->name:'-'}}</td>
-                            <td>{{$payment->account?$payment->account->name:'-'}}</td>
-                            <td>BDT {{priceFormat($payment->amount)}}</td>
-                            <td>{{$payment->created_at->format('d-m-Y')}}</td>
-                            <td>{!!$payment->description!!}</td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="text-center text-muted"><em>No data found</em></td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-                {{$payments->links('pagination::bootstrap-4')}}
+
+        <form action="{{route('admin.creditorBillPayments.index')}}" method="GET">
+            <div class="row">
+                <div class="col-md-3 mb-1">
+                    <input type="text" name="title" value="{{request('title')}}" class="form-control form-control-sm" placeholder="Bill Title / Transaction ID">
+                </div>
+                <div class="col-md-2 mb-1">
+                    <input type="text" name="creditor_name" value="{{request('creditor_name')}}" class="form-control form-control-sm" placeholder="Creditor Name">
+                </div>
+                <div class="col-md-2 mb-1">
+                    <input type="text" name="creditor_code" value="{{request('creditor_code')}}" class="form-control form-control-sm" placeholder="Creditor Code">
+                </div>
+                <div class="col-md-2 mb-1">
+                    <select name="account_id" class="form-control form-control-sm">
+                        <option value="">All Accounts</option>
+                        @foreach($filterAccounts as $account)
+                        <option value="{{$account->id}}" {{request('account_id') == $account->id ? 'selected' : ''}}>{{$account->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2 mb-1">
+                    <div class="input-group">
+                        <input type="date" name="startDate" value="{{request('startDate')}}" class="form-control form-control-sm">
+                        <input type="date" name="endDate" value="{{request('endDate')}}" class="form-control form-control-sm">
+                    </div>
+                </div>
+                <div class="col-md-1 mb-1 d-flex gap-2">
+                    <button type="submit" class="btn btn-sm btn-success w-100 mr-2">Search</button>
+                    <a href="{{route('admin.creditorBillPayments.index')}}" class="btn btn-sm btn-custom yellow">Reset</a>
+                </div>
             </div>
+        </form>
+
+        <br>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th width="50">SL</th>
+                        <th>Date</th>
+                        <th>Creditor</th>
+                        <th>Code</th>
+                        <th>Title / Ref</th>
+                        <th>Details</th>
+                        <th class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($ledgerEntries as $i => $row)
+                    <tr>
+                        <td>{{$ledgerEntries->firstItem() + $i}}</td>
+                        <td>{{$row->date?$row->date->format('d.m.Y'):'-'}}</td>
+                        <td>{{$row->creditor?$row->creditor->name:'-'}}</td>
+                        <td>{{$row->creditor?$row->creditor->code:'-'}}</td>
+                        <td>{{$row->title}}</td>
+                        <td><small class="text-muted">{{$row->description?:'-'}}</small></td>
+                        <td class="text-end @if($row->credit > 0) text-success @else text-danger @endif">
+                            @if($row->credit > 0)+ @endif
+                            @if($row->debit > 0)- @endif
+                            {{number_format($row->credit > 0 ? $row->credit : $row->debit, 2)}}
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center text-muted"><em>No payment records found</em></td>
+                    </tr>
+                    @endforelse
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="6" class="text-right">Net Balance:</th>
+                        <th class="text-end">{{number_format($totalBills - $totalPayments, 2)}}</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        {{$ledgerEntries->links('pagination::bootstrap-4')}}
     </div>
 </div>
 </div>

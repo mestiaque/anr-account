@@ -12,7 +12,7 @@ class Creditor extends Model
     protected $table = 'ac_creditors';
 
     protected $fillable = [
-        'name', 'company_name', 'mobile', 'email', 'address', 'status',
+        'name', 'code', 'company_name', 'mobile', 'email', 'address', 'status',
         'legacy_user_id', 'created_by', 'editedby_id', 'deleted_by',
     ];
 

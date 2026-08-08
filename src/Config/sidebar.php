@@ -4,7 +4,7 @@ return [
     [
         'group_title' => '',
         [
-            'title'      => 'Accounts (New)',
+            'title'      => 'Accounts Management',
             'icon'       => 'fa-solid fa-wallet',
             'icon_color' => 'text-primary',
             'permission' => '',
