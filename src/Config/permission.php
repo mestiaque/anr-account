@@ -42,5 +42,9 @@ return [
             'label' => 'Payment Methods',
             'permissions' => ['list' => 'List', 'add' => 'Create', 'edit' => 'Edit', 'delete' => 'Delete', 'all' => 'All'],
         ],
+        'ac_accounts_statement' => [
+            'label' => 'Accounts Statement',
+            'permissions' => ['list' => 'List', 'all' => 'All'],
+        ],
     ],
 ];

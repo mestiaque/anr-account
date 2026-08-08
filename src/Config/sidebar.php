@@ -99,7 +99,7 @@ return [
                     'icon'       => 'fa-solid fa-arrow-right',
                     'route'      => '/admin/v2/accounts/statement',
                     'icon_color' => 'text-warning',
-                    'permission' => 'ac_accounts',
+                    'permission' => 'ac_accounts_statement',
                 ],
                 [
                     'title'      => 'Expense Reports',
