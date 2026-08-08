@@ -141,4 +141,28 @@ class IouController extends Controller
             'name' => $employee?->name,
         ]);
     }
+
+    public function report(Request $r)
+    {
+        $from = $r->startDate ? Carbon::parse($r->startDate) : Carbon::now();
+        $to = $r->endDate ? Carbon::parse($r->endDate) : Carbon::now();
+
+        $expenses = Iou::latest()->whereNotIn('status', ['temp', 'completed'])
+            ->when($r->search, fn ($q) => $q->where('employee_id', $r->search))
+            ->when($r->branch_id, fn ($q) => $q->where('branch_id', $r->branch_id))
+            ->when($r->employee, fn ($q) => $q->where(function ($sub) use ($r) {
+                $sub->where('employee_id', 'like', '%' . $r->employee . '%')
+                    ->orWhereHas('employeeUser', fn ($query) => $query->where('name', 'like', '%' . $r->employee . '%'));
+            }))
+            ->when($r->account_id, fn ($q) => $q->where('account_id', $r->account_id))
+            ->whereDate('transaction_date', '>=', $from)
+            ->whereDate('transaction_date', '<=', $to)
+            ->get();
+
+        $users = User::where('status', 1)->orderBy('name')->get();
+        $filterAccounts = Account::where('status', 'active')->orderBy('name')->get();
+        $branches = Branch::where('status', 'active')->orderBy('name')->get();
+
+        return view('erp-accounts::expenses.expenseIOUReports', compact('expenses', 'users', 'from', 'to', 'branches', 'filterAccounts'));
+    }
 }

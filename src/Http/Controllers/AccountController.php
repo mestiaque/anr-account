@@ -111,4 +111,86 @@ class AccountController extends Controller
             ->selectRaw("SUM(CASE WHEN direction = 'credit' THEN amount ELSE -amount END) as balance")
             ->value('balance') ?? 0;
     }
+
+    public function statement(Request $r)
+    {
+        $accounts = Account::where('status', 'active')->orderBy('name')->get();
+        $accountId = $r->account_id ?? $accounts->first()?->id;
+        $method = Account::find($accountId);
+
+        $from = $r->startDate ? Carbon::parse($r->startDate) : Carbon::now()->subDays(30);
+        $to = $r->endDate ? Carbon::parse($r->endDate) : Carbon::now();
+
+        $openingBalance = 0;
+        $debetTotal = 0;
+        $creditTotal = 0;
+        $transections = collect();
+
+        if ($method) {
+            $openingBalance = $this->balanceAsOf($method, $from);
+
+            $transections = Transaction::with(['account'])
+                ->where('account_id', $method->id)
+                ->where('status', 'success')
+                ->whereDate('transaction_date', '>=', $from)
+                ->whereDate('transaction_date', '<=', $to)
+                ->orderBy('transaction_date')
+                ->orderBy('id')
+                ->get();
+
+            $balance = $openingBalance;
+            $transections->each(function (Transaction $t) use (&$balance, &$debetTotal, &$creditTotal) {
+                if ($t->direction === 'credit') {
+                    $balance += $t->amount;
+                    $creditTotal += $t->amount;
+                } else {
+                    $balance -= $t->amount;
+                    $debetTotal += $t->amount;
+                }
+                $t->running_balance = $balance;
+                $t->reference = $this->referenceLabel($t);
+                $t->particulars = $this->particularsFor($t);
+            });
+        }
+
+        return view('erp-accounts::accounts.accountsStatement', compact('accounts', 'method', 'openingBalance', 'transections', 'from', 'to', 'debetTotal', 'creditTotal'));
+    }
+
+    protected function referenceLabel(Transaction $t): string
+    {
+        return match ($t->source_type) {
+            'expense' => 'Expense',
+            'iou' => 'I.O.U',
+            'deposit' => 'Deposit',
+            'withdrawal' => 'Withdrawal',
+            'transfer' => 'Transfer Balance',
+            'creditor_bill_payment' => 'Creditor Bill',
+            default => 'Unknown',
+        };
+    }
+
+    protected function particularsFor(Transaction $t): string
+    {
+        $source = $t->source;
+
+        return match ($t->source_type) {
+            'expense' => $source
+                ? "Company: {$source->company_name} | Receiver: {$source->receiver_name}" . ($source->description ? " | Desc: {$source->description}" : '')
+                : 'N/A',
+            'iou' => $source
+                ? "Company: {$source->company_name} | Receiver: {$source->receiver_name}" . ($source->description ? " | Desc: {$source->description}" : '')
+                : 'N/A',
+            'deposit' => $source
+                ? 'Received From: ' . ($source->received_from ?? 'N/A') . ($source->description ? " | Desc: {$source->description}" : '')
+                : 'Deposit',
+            'withdrawal' => $source?->description ?: 'Withdrawal',
+            'transfer' => $source
+                ? ($t->direction === 'debit' ? 'To: ' . ($source->toAccount?->name ?? 'N/A') : 'From: ' . ($source->fromAccount?->name ?? 'N/A'))
+                : 'Transfer',
+            'creditor_bill_payment' => $source
+                ? 'Creditor: ' . ($source->creditor?->name ?? 'N/A') . ($source->description ? " | Desc: {$source->description}" : '')
+                : 'N/A',
+            default => $t->transaction_no,
+        };
+    }
 }

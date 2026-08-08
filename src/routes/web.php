@@ -24,6 +24,7 @@ Route::middleware(['web', 'logUserActivity', 'auth', 'redirectUser'])
         Route::prefix('accounts')->name('accounts.')->group(function () {
             Route::get('/', [AccountController::class, 'index'])->name('index');
             Route::post('/', [AccountController::class, 'store'])->name('store');
+            Route::get('/statement', [AccountController::class, 'statement'])->name('statement');
             Route::get('/{account}', [AccountController::class, 'show'])->name('show');
             Route::put('/{account}', [AccountController::class, 'update'])->name('update');
             Route::delete('/{account}', [AccountController::class, 'destroy'])->name('destroy');
@@ -32,6 +33,8 @@ Route::middleware(['web', 'logUserActivity', 'auth', 'redirectUser'])
         Route::prefix('expenses')->name('expenses.')->group(function () {
             Route::get('/', [ExpenseController::class, 'index'])->name('index');
             Route::post('/', [ExpenseController::class, 'store'])->name('store');
+            Route::get('/reports', [ExpenseController::class, 'report'])->name('reports');
+            Route::post('/audit', [ExpenseController::class, 'audit'])->name('audit');
             Route::put('/{expense}', [ExpenseController::class, 'update'])->name('update');
             Route::delete('/{expense}', [ExpenseController::class, 'destroy'])->name('destroy');
         });
@@ -46,6 +49,7 @@ Route::middleware(['web', 'logUserActivity', 'auth', 'redirectUser'])
         Route::prefix('ious')->name('ious.')->group(function () {
             Route::get('/', [IouController::class, 'index'])->name('index');
             Route::get('/completed', [IouController::class, 'completed'])->name('completed');
+            Route::get('/reports', [IouController::class, 'report'])->name('reports');
             Route::post('/', [IouController::class, 'store'])->name('store');
             Route::put('/{iou}', [IouController::class, 'update'])->name('update');
             Route::delete('/{iou}', [IouController::class, 'destroy'])->name('destroy');

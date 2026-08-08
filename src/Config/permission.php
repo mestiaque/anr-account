@@ -8,7 +8,7 @@ return [
         ],
         'ac_expenses' => [
             'label' => 'Expenses',
-            'permissions' => ['list' => 'List', 'add' => 'Create', 'edit' => 'Edit', 'view' => 'View', 'delete' => 'Delete', 'all' => 'All'],
+            'permissions' => ['list' => 'List', 'add' => 'Create', 'edit' => 'Edit', 'view' => 'View', 'delete' => 'Delete', 'audit' => 'Audit', 'all' => 'All'],
         ],
         'ac_expense_categories' => [
             'label' => 'Expense Categories',

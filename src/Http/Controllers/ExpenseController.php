@@ -4,6 +4,7 @@ namespace ME\Accounts\Http\Controllers;
 
 use ME\Accounts\Models\Account;
 use ME\Accounts\Models\Branch;
+use ME\Accounts\Models\CreditorBillPayment;
 use ME\Accounts\Models\Expense;
 use ME\Accounts\Models\ExpenseCategory;
 use ME\Accounts\Models\PaymentMethod;
@@ -126,6 +127,45 @@ class ExpenseController extends Controller
         $expense->delete();
 
         Session()->flash('success', 'Expense successfully deleted');
+        return redirect()->back();
+    }
+
+    public function report(Request $r)
+    {
+        $from = $r->startDate ? Carbon::parse($r->startDate) : Carbon::now();
+        $to = $r->endDate ? Carbon::parse($r->endDate) : Carbon::now();
+
+        $expenses = Expense::latest()->where('status', 'active')
+            ->when($r->search, fn ($q) => $q->where('expense_no', 'LIKE', '%' . $r->search . '%'))
+            ->when($r->expense_type, fn ($q) => $q->where('category_id', $r->expense_type))
+            ->when($r->branch_id, fn ($q) => $q->where('branch_id', $r->branch_id))
+            ->when($r->method, fn ($q) => $q->where('payment_method_id', $r->method))
+            ->when($r->account_id, fn ($q) => $q->where('account_id', $r->account_id))
+            ->whereDate('transaction_date', '>=', $from)
+            ->whereDate('transaction_date', '<=', $to)
+            ->get();
+
+        $expenseTypes = ExpenseCategory::where('status', 'active')->orderBy('name')->get();
+        $filterAccounts = Account::where('status', 'active')->orderBy('name')->get();
+        $branches = Branch::where('status', 'active')->orderBy('name')->get();
+        $supplierBill = CreditorBillPayment::whereDate('transaction_date', '>=', $from)->whereDate('transaction_date', '<=', $to)->sum('amount');
+
+        if ($r->summery) {
+            return view('erp-accounts::expenses.expenseSummeryReports', compact('expenses', 'expenseTypes', 'from', 'to', 'branches', 'supplierBill', 'filterAccounts'));
+        }
+
+        return view('erp-accounts::expenses.expenseReports', compact('expenses', 'expenseTypes', 'from', 'to', 'branches', 'supplierBill', 'filterAccounts'));
+    }
+
+    public function audit(Request $r)
+    {
+        Expense::whereIn('id', $r->audit_data ?? [])->whereNull('audit_at')->get()->each(function (Expense $expense) {
+            $expense->audit_at = now();
+            $expense->audit_by = Auth::id();
+            $expense->save();
+        });
+
+        Session()->flash('success', 'You have successfully audited the report');
         return redirect()->back();
     }
 }
