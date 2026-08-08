@@ -27,10 +27,14 @@ class ReconcileCommand extends Command
 
     public function handle(): int
     {
-        $anyIssue = $this->checkBalances() || $this->checkOrphans();
+        $anyOrphans = $this->checkOrphans();
+        $anyMismatches = $this->checkAmountMismatches();
+        $anyBalanceDrift = $this->checkBalances();
+
+        $anyIssue = $anyOrphans || $anyMismatches || $anyBalanceDrift;
 
         if (!$anyIssue) {
-            $this->info('✅ Everything is in sync — no balance drift, no orphaned records.');
+            $this->info('✅ Everything is in sync — no balance drift, no orphaned records, no amount mismatches.');
         } elseif (!$this->option('fix')) {
             $this->warn('⚠️  Issues found. Re-run with --fix to correct them.');
         }
@@ -130,6 +134,59 @@ class ReconcileCommand extends Command
         }
 
         return $anyOrphans;
+    }
+
+    /**
+     * A source record's amount can drift from its linked transaction's amount if it was
+     * ever edited outside the Observer layer (e.g. a legacy record whose amount was fixed
+     * up directly in the old system without the linked legacy transaction being updated
+     * to match). The source record's current amount is treated as the trusted value —
+     * the linked transaction (and account balance) is adjusted to match it.
+     */
+    protected function checkAmountMismatches(): bool
+    {
+        $anyMismatch = false;
+        $rows = [];
+
+        foreach ($this->orphanSources as $sourceType => $modelClass) {
+            $mismatches = [];
+
+            $modelClass::when($this->argument('account'), fn ($q) => $q->where('account_id', $this->argument('account')))
+                ->orderBy('created_at')
+                ->chunk(300, function ($chunk) use (&$mismatches, $sourceType) {
+                    foreach ($chunk as $record) {
+                        $txn = Transaction::where('source_type', $sourceType)->where('source_id', $record->id)->first();
+                        if ($txn && round((float) $txn->amount, 2) !== round((float) $record->amount, 2)) {
+                            $mismatches[] = ['record' => $record, 'txn' => $txn];
+                        }
+                    }
+                });
+
+            if (empty($mismatches)) {
+                continue;
+            }
+
+            $anyMismatch = true;
+            $diffSum = collect($mismatches)->sum(fn ($m) => $m['record']->amount - $m['txn']->amount);
+            $rows[] = [$sourceType, count($mismatches), number_format($diffSum, 2)];
+
+            if ($this->option('fix')) {
+                foreach ($mismatches as $m) {
+                    LedgerService::adjustAmount($m['txn'], (float) $m['record']->amount);
+                }
+            }
+        }
+
+        if ($anyMismatch) {
+            $this->newLine();
+            $this->info('Amount mismatches (source record amount ≠ linked transaction amount):');
+            $this->table(['Source Type', 'Count', 'Net Balance Impact If Fixed'], $rows);
+            if ($this->option('fix')) {
+                $this->info('→ Synced each linked transaction (and account balance) to match its source record\'s current amount.');
+            }
+        }
+
+        return $anyMismatch;
     }
 
     protected function fixOrphan(string $sourceType, $record): void

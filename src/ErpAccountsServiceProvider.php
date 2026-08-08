@@ -5,6 +5,7 @@ namespace ME\Accounts;
 use Illuminate\Support\ServiceProvider;
 use ME\Accounts\Console\Commands\MigrateLegacyCommand;
 use ME\Accounts\Console\Commands\ReconcileCommand;
+use ME\Accounts\Console\Commands\SyncCommand;
 use ME\Accounts\Models\BalanceTransfer;
 use ME\Accounts\Models\CreditorBillPayment;
 use ME\Accounts\Models\Deposit;
@@ -69,6 +70,7 @@ class ErpAccountsServiceProvider extends ServiceProvider
             $this->commands([
                 MigrateLegacyCommand::class,
                 ReconcileCommand::class,
+                SyncCommand::class,
             ]);
         }
     }
