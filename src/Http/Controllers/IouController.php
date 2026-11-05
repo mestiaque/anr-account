@@ -28,11 +28,12 @@ class IouController extends Controller
         }
 
         $expenseIou = Iou::whereNotIn('status', ['temp', 'completed'])
-            ->when($r->search, fn ($q) => $q->where('employee_id', 'LIKE', '%' . $r->search . '%')
+            ->when($r->search, fn ($q) => $q->where(fn ($qq) => $qq
+                ->where('employee_id', 'LIKE', '%' . $r->search . '%')
                 ->orWhere('company_name', 'LIKE', '%' . $r->search . '%')
-                ->orWhere('receiver_name', 'LIKE', '%' . $r->search . '%'))
+                ->orWhere('receiver_name', 'LIKE', '%' . $r->search . '%')))
             ->when($r->account_id, fn ($q) => $q->where('account_id', $r->account_id))
-            ->latest()
+            ->orderBy('transaction_date', 'desc')
             ->get();
 
         $paymentMethods = PaymentMethod::where('status', 'active')->orderBy('name')->get();
@@ -43,6 +44,7 @@ class IouController extends Controller
 
         return view('erp-accounts::expenses.expensesIOU', compact('expenseIou', 'paymentMethods', 'accountMethods', 'filterAccounts', 'branches', 'users'));
     }
+
 
     public function completed(Request $r)
     {
